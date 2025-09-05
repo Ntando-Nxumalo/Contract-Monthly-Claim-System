@@ -1,32 +1,57 @@
-using System.Diagnostics;
-using Contract_Monthly_Claim_System.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contract_Monthly_Claim_System.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
+        // GET: Home/Index (Login Page)
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult Privacy()
+        // GET: Home/Register (Registration Page)
+        public IActionResult Register()
         {
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        // POST: Home/Login
+        [HttpPost]
+        public IActionResult Login(string email, string password)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            // Add your authentication logic here
+            if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
+            {
+                // Successful login logic
+                return RedirectToAction("Dashboard", "Home");
+            }
+
+            // Failed login
+            ViewBag.Error = "Invalid login attempt";
+            return View("Index");
+        }
+
+        // POST: Home/Register
+        [HttpPost]
+        public IActionResult Register(string name, string role, string email, string password)
+        {
+            // Add your registration logic here
+            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
+            {
+                // Successful registration logic
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Failed registration
+            ViewBag.Error = "Please fill all required fields";
+            return View("Register");
+        }
+
+        // Dashboard after successful login
+        public IActionResult Dashboard()
+        {
+            return View();
         }
     }
 }

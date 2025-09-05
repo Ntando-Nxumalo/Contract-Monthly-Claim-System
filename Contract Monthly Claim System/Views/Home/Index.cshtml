@@ -2,7 +2,34 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/site.css">
+    <link rel="stylesheet" href="~/css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h2>Welcome to the Contract Monthly Claim System</h2>
+            <p>Sign in to your CMCS account</p>
+        </div>
+
+        <form method="post" asp-action="Login">
+            <div class="form-group">
+                <input type="email" class="form-control" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <input type="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Sign In</button>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="@Url.Action("Register", "Home")">Register now</a></p>
+            </div>
+        </form>
+    </div>
+</body>
