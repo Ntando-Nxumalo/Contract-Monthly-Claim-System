@@ -452,138 +452,134 @@
     </style>
 </head>
 <body>
+    <!-- Dashboard Welcome -->
+    <div class="dashboard-welcome">
+        <h1><i class="fas fa-chalkboard-teacher"></i> Lecturer Dashboard</h1>
+        <p>Welcome, Lecturer! Manage your claims and track their status.</p>
+    </div>
 
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="action-card">
+            <i class="fas fa-plus-circle"></i>
+            <h3>Submit New Claim</h3>
+            <p>Create and submit a new expense claim for your teaching activities.</p>
+            <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Submit Claim</button>
+        </div>
+        <div class="action-card">
+            <i class="fas fa-file-upload"></i>
+            <h3>Upload Documents</h3>
+            <p>Upload supporting documents for your existing claims.</p>
+            <button class="btn btn-primary" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload Documents</button>
+        </div>
+        <div class="action-card">
+            <i class="fas fa-history"></i>
+            <h3>Claim History</h3>
+            <p>View the status and history of all your submitted claims.</p>
+            <button class="btn btn-primary"><i class="fas fa-list"></i> View History</button>
+        </div>
+    </div>
 
-        <!-- Dashboard Welcome -->
-        <div class="dashboard-welcome">
-            <h1><i class="fas fa-chalkboard-teacher"></i> Lecturer Dashboard</h1>
-            <p>Welcome, Lecturer! Manage your claims and track their status.</p>
+    <!-- Claims Status Overview -->
+    <div class="claims-status">
+        <div class="section-header">
+            <h2><i class="fas fa-chart-pie"></i> Claims Overview</h2>
+            <a href="#" class="btn btn-primary">View All</a>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <div class="action-card">
-                <i class="fas fa-plus-circle"></i>
-                <h3>Submit New Claim</h3>
-                <p>Create and submit a new expense claim for your teaching activities.</p>
-                <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Submit Claim</button>
+        <div class="status-cards">
+            <div class="status-card submitted">
+                <h3>4</h3>
+                <p>Total Claims</p>
             </div>
 
-            <div class="action-card">
-                <i class="fas fa-file-upload"></i>
-                <h3>Upload Documents</h3>
-                <p>Upload supporting documents for your existing claims.</p>
-                <button class="btn btn-primary" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload Documents</button>
+            <div class="status-card pending">
+                <h3>1</h3>
+                <p>Pending</p>
             </div>
 
-            <div class="action-card">
-                <i class="fas fa-history"></i>
-                <h3>Claim History</h3>
-                <p>View the status and history of all your submitted claims.</p>
-                <button class="btn btn-primary"><i class="fas fa-list"></i> View History</button>
+            <div class="status-card approved">
+                <h3>2</h3>
+                <p>Approved</p>
+            </div>
+
+            <div class="status-card rejected">
+                <h3>1</h3>
+                <p>Rejected</p>
             </div>
         </div>
+    </div>
 
-        <!-- Claims Status Overview -->
-        <div class="claims-status">
-            <div class="section-header">
-                <h2><i class="fas fa-chart-pie"></i> Claims Overview</h2>
-                <a href="#" class="btn btn-primary">View All</a>
-            </div>
-
-            <div class="status-cards">
-                <div class="status-card submitted">
-                    <h3>12</h3>
-                    <p>Total Claims</p>
-                </div>
-
-                <div class="status-card pending">
-                    <h3>5</h3>
-                    <p>Pending</p>
-                </div>
-
-                <div class="status-card approved">
-                    <h3>6</h3>
-                    <p>Approved</p>
-                </div>
-
-                <div class="status-card rejected">
-                    <h3>1</h3>
-                    <p>Rejected</p>
-                </div>
-            </div>
+    <!-- Recent Claims -->
+    <div class="recent-claims">
+        <div class="section-header">
+            <h2><i class="fas fa-clock"></i> Recent Claims</h2>
+            <a href="#" class="btn btn-primary">View All</a>
         </div>
 
-        <!-- Recent Claims -->
-        <div class="recent-claims">
-            <div class="section-header">
-                <h2><i class="fas fa-clock"></i> Recent Claims</h2>
-                <a href="#" class="btn btn-primary">View All</a>
-            </div>
-
-            <table class="claims-table">
-                <thead>
-                    <tr>
-                        <th>Claim ID</th>
-                        <th>Date Submitted</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Claim-001</td>
-                        <td>Oct 15, 2023</td>
-                        <td>Conference Travel Expenses</td>
-                        <td>R44480.00</td>
-                        <td><span class="status-badge status-pending">Pending Review</span></td>
-                        <td>
-                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
-                                <i class="fas fa-eye"></i> View
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Claim-002</td>
-                        <td>Oct 10, 2023</td>
-                        <td>Research Materials</td>
-                        <td>R8220.50</td>
-                        <td><span class="status-badge status-approved">Approved</span></td>
-                        <td>
-                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
-                                <i class="fas fa-eye"></i> View
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Claim-003</td>
-                        <td>Oct 05, 2023</td>
-                        <td>Workshop Registration</td>
-                        <td>R13400.00</td>
-                        <td><span class="status-badge status-approved">Paid</span></td>
-                        <td>
-                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
-                                <i class="fas fa-eye"></i> View
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Claim-004</td>
-                        <td>Sep 28, 2023</td>
-                        <td>Textbook Purchases</td>
-                        <td>R2175.25</td>
-                        <td><span class="status-badge status-rejected">Rejected</span></td>
-                        <td>
-                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
-                                <i class="fas fa-eye"></i> View
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <table class="claims-table">
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Date Submitted</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Claim-005</td>
+                    <td>Aug 18, 2025</td>
+                    <td>Research Conference Travel</td>
+                    <td>R 11,500.00</td>
+                    <td><span class="status-badge status-pending">Pending Review</span></td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Claim-006</td>
+                    <td>Aug 17, 2025</td>
+                    <td>Course Materials</td>
+                    <td>R 4,550.00</td>
+                    <td><span class="status-badge status-approved">Approved</span></td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Claim-007</td>
+                    <td>Aug 16, 2025</td>
+                    <td>Software License Renewal</td>
+                    <td>R 7,400.00</td>
+                    <td><span class="status-badge status-approved">Paid</span></td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Claim-008</td>
+                    <td>Aug 15, 2025</td>
+                    <td>Workshop Attendance</td>
+                    <td>R 6,500.00</td>
+                    <td><span class="status-badge status-rejected">Rejected</span></td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     
 
     <!-- Submit Claim Modal -->

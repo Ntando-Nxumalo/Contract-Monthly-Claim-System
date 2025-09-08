@@ -1,1 +1,828 @@
-﻿
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manager Dashboard - CMCS</title>
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Navigation */
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+            .header-nav h2 {
+                font-weight: 700;
+                font-size: 24px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .nav-menu a {
+                color: white;
+                text-decoration: none;
+                padding: 10px 15px;
+                border-radius: 6px;
+                transition: background-color 0.3s;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+                .nav-menu a:hover, .nav-menu a.active {
+                    background-color: rgba(255, 255, 255, 0.2);
+                }
+
+            .nav-menu .separator {
+                color: rgba(255, 255, 255, 0.3);
+                font-weight: 300;
+            }
+
+        /* Dashboard Welcome */
+        .dashboard-welcome {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+            .dashboard-welcome h1 {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+                font-weight: 700;
+            }
+
+            .dashboard-welcome p {
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+                opacity: 0.9;
+            }
+
+        /* Overview Stats */
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .stat-card i {
+                font-size: 36px;
+                margin-bottom: 15px;
+            }
+
+            .stat-card.total i {
+                color: #3498db;
+            }
+
+            .stat-card.pending i {
+                color: #f39c12;
+            }
+
+            .stat-card.approved i {
+                color: #2ecc71;
+            }
+
+            .stat-card.budget i {
+                color: #9b59b6;
+            }
+
+            .stat-card h3 {
+                font-size: 2.2rem;
+                margin-bottom: 5px;
+                color: #2c3e50;
+            }
+
+            .stat-card p {
+                color: #7f8c8d;
+                font-weight: 500;
+            }
+
+        /* Dashboard Sections */
+        .dashboard-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+            .section-header h2 {
+                color: #2c3e50;
+                font-size: 1.6rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+        /* Budget Overview */
+        .budget-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .budget-card {
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+            .budget-card.allocated {
+                border-left: 4px solid #3498db;
+            }
+
+            .budget-card.spent {
+                border-left: 4px solid #2ecc71;
+            }
+
+            .budget-card.remaining {
+                border-left: 4px solid #f39c12;
+            }
+
+            .budget-card.overspent {
+                border-left: 4px solid #e74c3c;
+            }
+
+            .budget-card h3 {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+
+            .budget-card p {
+                color: #7f8c8d;
+                font-weight: 500;
+            }
+
+        .progress-bar {
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            border-radius: 5px;
+        }
+
+            .progress.allocated {
+                background: #3498db;
+                width: 100%;
+            }
+
+            .progress.spent {
+                background: #2ecc71;
+                width: 65%;
+            }
+
+            .progress.remaining {
+                background: #f39c12;
+                width: 35%;
+            }
+
+            .progress.overspent {
+                background: #e74c3c;
+                width: 10%;
+            }
+
+        /* Analytics Charts */
+        .analytics-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #eee 25%, #f8f9fa 25%, #f8f9fa 50%, #eee 50%, #eee 75%, #f8f9fa 75%, #f8f9fa 100%);
+            background-size: 20px 20px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        /* Department Performance */
+        .dept-performance {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .dept-card {
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+
+            .dept-card h3 {
+                margin-bottom: 15px;
+                color: #2c3e50;
+            }
+
+        .dept-stats {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .dept-stat {
+            text-align: center;
+        }
+
+            .dept-stat h4 {
+                font-size: 1.5rem;
+                margin-bottom: 5px;
+                color: #2c3e50;
+            }
+
+            .dept-stat p {
+                color: #7f8c8d;
+                font-size: 0.9rem;
+            }
+
+        /* Claims Table */
+        .claims-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .claims-table th, .claims-table td {
+                padding: 15px;
+                text-align: left;
+                border-bottom: 1px solid #eee;
+            }
+
+            .claims-table th {
+                background-color: #f8f9fa;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            .claims-table tr:hover {
+                background-color: #f8f9fa;
+            }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background-color: #ffeaa7;
+            color: #d35400;
+        }
+
+        .status-approved {
+            background-color: #d1f7c4;
+            color: #27ae60;
+        }
+
+        .status-rejected {
+            background-color: #ffcfc6;
+            color: #c0392b;
+        }
+
+        .status-paid {
+            background-color: #d6eaf8;
+            color: #2980b9;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background-color: #c0392b;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        .btn-secondary {
+            background-color: #3498db;
+            color: white;
+        }
+
+            .btn-secondary:hover {
+                background-color: #2980b9;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+            .modal-header h2 {
+                color: #2c3e50;
+                font-size: 1.6rem;
+            }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            .close:hover {
+                color: #000;
+            }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .header-nav
+
+        {
+            flex-direction: column;
+            text-align: center;
+            gap: 15px;
+        }
+
+        .nav-menu {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .overview-stats, .budget-cards, .analytics-charts, .dept-performance {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-welcome h1 {
+            font-size: 2rem;
+        }
+
+        .claims-table {
+            display: block;
+            overflow-x: auto;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    
+
+        <!-- Dashboard Welcome -->
+        <div class="dashboard-welcome">
+            <h1><i class="fas fa-chart-line"></i> Manager Dashboard</h1>
+            <p>Welcome,  Oversee all claim activities and system performance.</p>
+        </div>
+
+        <!-- Overview Stats -->
+        <div class="overview-stats">
+            <div class="stat-card total">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h3>142</h3>
+                <p>Total Claims</p>
+            </div>
+
+            <div class="stat-card pending">
+                <i class="fas fa-clock"></i>
+                <h3>18</h3>
+                <p>Pending Approval</p>
+            </div>
+
+            <div class="stat-card approved">
+                <i class="fas fa-check-circle"></i>
+                <h3>104</h3>
+                <p>Approved Claims</p>
+            </div>
+
+            <div class="stat-card budget">
+                <i class="fas fa-money-bill-wave"></i>
+                <h3>R 825,000</h3>
+                <p>Total Processed</p>
+            </div>
+        </div>
+
+        <!-- Budget Overview Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-wallet"></i> Budget Overview</h2>
+                <a href="#" class="btn btn-primary">Manage Budget</a>
+            </div>
+
+            <div class="budget-cards">
+                <div class="budget-card allocated">
+                    <h3>R 1,500,000</h3>
+                    <p>Total Budget Allocated</p>
+                    <div class="progress-bar">
+                        <div class="progress allocated"></div>
+                    </div>
+                </div>
+
+                <div class="budget-card spent">
+                    <h3>R 900,000</h3>
+                    <p>Budget Spent</p>
+                    <div class="progress-bar">
+                        <div class="progress spent"></div>
+                    </div>
+                </div>
+
+                <div class="budget-card remaining">
+                    <h3>R 600,000</h3>
+                    <p>Budget Remaining</p>
+                    <div class="progress-bar">
+                        <div class="progress remaining"></div>
+                    </div>
+                </div>
+
+                <div class="budget-card overspent">
+                    <h3>R 0</h3>
+                    <p>Overspent</p>
+                    <div class="progress-bar">
+                        <div class="progress overspent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-bar"></i> Analytics & Reports</h2>
+                <a href="#" class="btn btn-primary">Generate Report</a>
+            </div>
+
+            <div class="analytics-charts">
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-pie" style="font-size: 24px; margin-right: 10px;"></i>
+                        Claims by Category Chart
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-line" style="font-size: 24px; margin-right: 10px;"></i>
+                        Monthly Claims Trend
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Performance -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> Department Performance</h2>
+                <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+
+            <div class="dept-performance">
+                <div class="dept-card">
+                    <h3>Computer Science</h3>
+                    <div class="dept-stats">
+                        <div class="dept-stat">
+                            <h4>42</h4>
+                            <p>Claims</p>
+                        </div>
+                        <div class="dept-stat">
+                            <h4>R 285,000</h4>
+                            <p>Amount</p>
+                        </div>
+                        <div class="dept-stat">
+                            <h4>88%</h4>
+                            <p>Approval Rate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dept-card">
+                    <h3>Engineering</h3>
+                    <div class="dept-stats">
+                        <div class="dept-stat">
+                            <h4>38</h4>
+                            <p>Claims</p>
+                        </div>
+                        <div class="dept-stat">
+                            <h4>R 320,000</h4>
+                            <p>Amount</p>
+                        </div>
+                        <div class="dept-stat">
+                            <h4>92%</h4>
+                            <p>Approval Rate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dept-card">
+                    <h3>Business</h3>
+                    <div class="dept-stats">
+                        <div class="dept-stat">
+                            <h4>29</h4>
+                            <p>Claims</p>
+                        </div>
+                        <div class="dept-stat">
+                            <h4>R 220,000</h4>
+                            <p>Amount</p>
+                        </div>
+                        <div class="dept-stat">
+                            <h4>79%</h4>
+                            <p>Approval Rate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent High-Value Claims -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="fas fa-money-bill-wave"></i> Recent High-Value Claims</h2>
+                <a href="#" class="btn btn-primary">View All Claims</a>
+            </div>
+
+            <table class="claims-table">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Lecturer</th>
+                        <th>Department</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Claim-005</td>
+                        <td>Dr. Thabo Mokoena</td>
+                        <td>Computer Science</td>
+                        <td>Research Conference Travel</td>
+                        <td>R 11,500.00</td>
+                        <td><span class="status-badge status-approved">Approved</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary btn-sm" onclick="viewClaim(005)"><i class="fas fa-eye"></i> View</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Claim-006</td>
+                        <td>Prof. Zanele Khumalo</td>
+                        <td>Engineering</td>
+                        <td>Course Materials</td>
+                        <td>R 4,550.00</td>
+                        <td><span class="status-badge status-paid">Paid</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary btn-sm" onclick="viewClaim(006)"><i class="fas fa-eye"></i> View</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Claim-007</td>
+                        <td>Dr. Lerato Dlamini</td>
+                        <td>Business</td>
+                        <td>Software License Renewal</td>
+                        <td>R 7,400.00</td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary btn-sm" onclick="viewClaim(007)"><i class="fas fa-eye"></i> View</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Claim-008</td>
+                        <td>Dr. Sipho Nkosi</td>
+                        <td>Computer Science</td>
+                        <td>Workshop Attendance</td>
+                        <td>R 6,500.00</td>
+                        <td><span class="status-badge status-approved">Approved</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary btn-sm" onclick="viewClaim(008)"><i class="fas fa-eye"></i> View</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Claim Detail Modal -->
+        <div id="claimModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-file-invoice-dollar"></i> Claim Details - Claim-<span id="claimId"></span></h2>
+                    <span class="close" onclick="closeModal()">&times;</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div class="detail-group">
+                        <label>Lecturer</label>
+                        <span id="claimLecturer">Dr. Thabo Mokoena</span>
+                    </div>
+
+                    <div class="detail-group">
+                        <label>Department</label>
+                        <span id="claimDepartment">Computer Science</span>
+                    </div>
+
+                    <div class="detail-group">
+                        <label>Submission Date</label>
+                        <span id="claimDate">August 18, 2025</span>
+                    </div>
+
+                    <div class="detail-group">
+                        <label>Category</label>
+                        <span id="claimCategory">Travel Expenses</span>
+                    </div>
+
+                    <div class="detail-group">
+                        <label>Amount</label>
+                        <span id="claimAmount">R 11,500.00</span>
+                    </div>
+
+                    <div class="detail-group">
+                        <label>Status</label>
+                        <span id="claimStatus"><span class="status-badge status-approved">Approved</span></span>
+                    </div>
+                </div>
+
+                <div class="detail-group">
+                    <label>Description</label>
+                    <span id="claimDescription">Expenses for attending the International Research Conference on Computer Science in Cape Town. Includes flight, accommodation, and conference fee.</span>
+                </div>
+
+                <div class="detail-group">
+                    <label>Approval History</label>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Submitted by Lecturer</span>
+                            <span>Aug 18, 2025</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Reviewed by Coordinator (Prof. Zanele Khumalo)</span>
+                            <span>Aug 19, 2025</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Approved by Manager</span>
+                            <span>Aug 20, 2025</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; text-align: right;">
+                    <button class="btn btn-primary" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        // Modal functionality
+        function viewClaim(claimId) {
+            document.getElementById('claimId').textContent = claimId.toString().padStart(4, '0');
+            document.getElementById('claimModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('claimModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('claimModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
