@@ -1,0 +1,211 @@
+﻿/* Welcome Section */
+.dashboard-welcome {
+    background: linear-gradient(135deg, #3498db 60%, #2c3e50 100%);
+    color: #fff;
+    padding: 32px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(44, 62, 80, 0.12);
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+    .dashboard-welcome h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .dashboard-welcome p {
+        font-size: 1.1rem;
+        margin-bottom: 18px;
+    }
+
+/* Dashboard Grid */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+/* Card Base */
+.card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(44, 62, 80, 0.08);
+    padding: 28px 20px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+    /* Hover effects */
+    .card:hover {
+        transform: translateY(-6px) scale(1.03);
+        box-shadow: 0 8px 24px rgba(44, 62, 80, 0.18);
+    }
+
+    /* Icon Styling */
+    .card i {
+        font-size: 2.5rem;
+        color: #3498db;
+        margin-bottom: 12px;
+    }
+
+    .card:hover i {
+        transform: scale(1.1);
+        color: #2c82c9;
+    }
+
+    /* Title */
+    .card h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #2c3e50;
+    }
+
+    /* Description */
+    .card p {
+        color: #7f8c8d;
+        font-size: 1rem;
+    }
+
+/* Role Switcher */
+.role-switcher {
+    background: #f5f7f9;
+    border-radius: 8px;
+    padding: 16px 0;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+}
+
+.role-switcher label {
+    font-size: 1rem;
+    color: #2c3e50;
+}
+
+.role-switcher select {
+    font-size: 1rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #3498db;
+    background: #fff;
+    color: #2c3e50;
+    margin-left: 8px;
+}
+
+/* Role View */
+.role-view {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+    padding: 24px 18px;
+    margin-bottom: 18px;
+    display: block;
+}
+
+.role-view.hidden {
+    display: none;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+/* Add these at the end of your dashboard.css for role-specific colors */
+#lecturerView {
+    border-left: 5px solid #3498db;
+}
+#lecturerView h3 i {
+    color: #3498db;
+}
+
+#coordinatorView {
+    border-left: 5px solid #2ecc71;
+}
+#coordinatorView h3 i {
+    color: #2ecc71;
+}
+
+#managerView {
+    border-left: 5px solid #e74c3c;
+}
+#managerView h3 i {
+    color: #e74c3c;
+}
+
+/* .btn and .btn-primary styles for dashboard buttons */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: white;
+    color: #3498db;
+}
+
+.btn-primary:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* .form-control for select */
+.form-control {
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+    display: inline-block;
+    max-width: 250px;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    background-color: #fff;
+}
+
+/* .mt-20 for horizontal rule */
+.mt-20 {
+    margin-top: 20px;
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #ddd, transparent);
+    margin: 40px 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboard-welcome {
+        padding: 18px 8px;
+    }
+    .dashboard-cards {
+        gap: 12px;
+    }
+    .card {
+        padding: 18px 8px;
+    }
+    .role-view {
+        padding: 12px 6px;
+
+    }
+}

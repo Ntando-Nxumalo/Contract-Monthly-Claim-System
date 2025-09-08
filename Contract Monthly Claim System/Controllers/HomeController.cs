@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Contract_Monthly_Claim_System.Controllers
 {
@@ -18,16 +21,28 @@ namespace Contract_Monthly_Claim_System.Controllers
 
         // POST: Home/Login
         [HttpPost]
-        public IActionResult Login(string email, string password)
+        public async Task<IActionResult> Login(string email, string password)
         {
-            // Add your authentication logic here
+            // Replace with real authentication logic
             if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
-                // Successful login logic
+                // Simulate user lookup and password check
+                // On success, sign in user
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, email),
+                    new Claim(ClaimTypes.Role, "Lecturer") // Default role for demo
+                };
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity)
+                );
+
                 return RedirectToAction("Dashboard", "Home");
             }
 
-            // Failed login
             ViewBag.Error = "Invalid login attempt";
             return View("Index");
         }
@@ -36,20 +51,45 @@ namespace Contract_Monthly_Claim_System.Controllers
         [HttpPost]
         public IActionResult Register(string name, string role, string email, string password)
         {
-            // Add your registration logic here
+            // Replace with real registration logic
             if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(password))
             {
-                // Successful registration logic
+                // Registration success, redirect to login
                 return RedirectToAction("Index", "Home");
             }
 
-            // Failed registration
             ViewBag.Error = "Please fill all required fields";
             return View("Register");
         }
 
         // Dashboard after successful login
+        [HttpGet]
         public IActionResult Dashboard()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return View();
+        }
+
+        // Logout
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult LectureDashboard()
+        {
+            return View();
+        }
+        public IActionResult CoordinatorDashboard()
+        {
+            return View();
+        }
+        public IActionResult ManagerDashboard()
         {
             return View();
         }

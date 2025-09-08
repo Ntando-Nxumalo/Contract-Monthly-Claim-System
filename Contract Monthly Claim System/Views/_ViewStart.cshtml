@@ -1,3 +1,11 @@
 ﻿@{
-    Layout = "_Layout";
+    var path = Context.Request.Path.Value ?? "";
+    if (path.Contains("Account/Login") || path.Contains("Account/Register"))
+    {
+        Layout = "_AuthLayout"; // no nav
+    }
+    else
+    {
+        Layout = "_Layout"; // with nav
+    }
 }

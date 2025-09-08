@@ -1,27 +1,20 @@
-﻿@{
-    var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - CMCS</title>
-    <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/dashboard.css" />
 </head>
 <body>
     <div class="container">
-       
-
-        <!-- Main Page Content -->
+        <!-- Main Content -->
         <main>
             @RenderBody()
         </main>
 
-        <!-- Footer -->
         <footer>
             &copy; @DateTime.Now.Year - Contract Monthly Claim System (CMCS)
         </footer>

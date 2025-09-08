@@ -1,49 +1,108 @@
-/* Global styles that apply to entire site */
+/* Global site-wide styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background-color: #f5f7f9;
     color: #333;
     line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
 }
 
-a {
-    color: #3498db;
-    text-decoration: none;
-    transition: color 0.3s ease;
+/* Header (Top Bar) */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #3498db, #2c3e50);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
 }
 
-    a:hover {
-        color: #2980b9;
-        text-decoration: underline;
+    header h2 {
+        font-weight: 700;
+        font-size: 24px;
     }
 
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
+nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-/* Utility classes */
-.text-center {
+    nav a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+        font-weight: 500;
+    }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+    nav .separator {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+    .logout-btn:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+/* Main Content Area */
+main {
+    min-height: 60vh;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Footer */
+footer {
+    margin-top: 40px;
     text-align: center;
+    font-size: 14px;
+    color: #7f8c8d;
+    padding: 20px;
 }
 
-.hidden {
-    display: none;
-}
+/* Responsive Layout */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
 
-.mt-20 {
-    margin-top: 20px;
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 15px;
+    }
 }

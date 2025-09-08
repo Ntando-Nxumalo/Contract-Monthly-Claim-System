@@ -1,58 +1,42 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/site.css">
-    <link rel="stylesheet" href="~/css/auth.css">
-</head>
-<body>
+﻿@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Registration"; 
+}
+
+<link rel="stylesheet" href="~/css/auth.css" />
+
+<div class="auth-page-center">
     <div class="auth-container">
         <div class="auth-header">
-            <h2>Create Account</h2>
-            <p>Join the Contract Monthly Claim System</p>
+            <h2>Register</h2>
+            <p>Create your account to access the dashboard.</p>
         </div>
-
-        <form method="post" asp-action="Register">
+        <form asp-action="Register" method="post">
             <div class="form-group">
-                <input type="text" class="form-control" placeholder="Enter your full name" required>
+                <input type="text" name="name" class="form-control" placeholder="Name" required />
             </div>
-
             <div class="form-group">
-                <select class="form-control" required>
-                    <option value="">Select your role</option>
-                    <option value="Lect">Lecturer</option>
-                    <option value="PC">Programme Coordinator</option>
-                    <option value="AM">Academic Manager</option>
+                <input type="email" name="email" class="form-control" placeholder="Email" required />
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" class="form-control" placeholder="Password" required />
+            </div>
+            <div class="form-group">
+                <select name="role" class="form-control" required>
+                    <option value="">Select Role</option>
+                    <option value="Lecturer">Lecturer</option>
+                    <option value="Coordinator">Coordinator</option>
+                    <option value="Manager">Manager</option>
                 </select>
             </div>
-
-            <div class="form-group">
-                <input type="email" class="form-control" placeholder="Enter your email" required>
-            </div>
-
-            <div class="form-group">
-                <input type="password" class="form-control" placeholder="Create a password" required>
-            </div>
-
-            <div class="form-group">
-                <input type="password" class="form-control" placeholder="Confirm password" required>
-            </div>
-
-            <div class="form-group terms">
-                <label class="checkbox-container">
-                    <input type="checkbox" required> I agree to the <a href="#">Terms and Conditions</a>
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-
+            @if (ViewBag.Error != null)
+            {
+                <div class="error-message">@ViewBag.Error</div>
+            }
             <button type="submit" class="btn btn-primary">Register</button>
-
-            <div class="auth-footer">
-                <p>Already have an account? <a href="@Url.Action("Index", "Home")">Sign in</a></p>
-            </div>
         </form>
+        <div class="auth-footer">
+            <span>Already have an account? <a href="@Url.Action("Index", "Home")">Login</a></span>
+        </div>
     </div>
-</body>
-</html>
+</div>
