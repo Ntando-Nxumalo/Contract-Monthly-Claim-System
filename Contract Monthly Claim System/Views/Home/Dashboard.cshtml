@@ -303,14 +303,14 @@
             <div class="nav-menu">
                 <a href="/Home/Dashboard" class="active"><i class="fas fa-th-large"></i> Dashboard</a>
                 <span class="separator">|</span>
-                <a href="/Home/My claims" class="active"><i class="fas fa-clipboard-list"></i> My Claims</a>
+                <a href="/Claims/MyClaims"><i class="fas fa-clipboard-list"></i> My Claims</a>
                 <span class="separator">|</span>
                 <a href="/Documents"><i class="fas fa-file-alt"></i> Documents</a>
                 <span class="separator">|</span>
                 <a href="/Account/Settings"><i class="fas fa-cog"></i> Settings</a>
                 <span class="separator">|</span>
                 <form asp-action="Logout" method="post" style="display:inline;">
-                    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; padding: 10px 15px; border-radius: 6px; font-weight: 500; display: flex; align-items: center; gap: 8px;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.backgroundColor='transparent'">
+                    <button type="submit" class="logout-btn">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </form>
@@ -319,8 +319,8 @@
 
         <!-- Dashboard Welcome -->
         <div class="dashboard-welcome">
-            <h1><i class="fas fa-file-contract"></i> Contract Claim System</h1>
-            <p>Welcome</p>
+            <h1><i class="fas fa-file-contract"></i> Contract Monthly Claim System</h1>
+            <p>Welcome to the Contract Monthly Claim System</p>
         </div>
 
         <!-- Role Switcher -->
@@ -328,8 +328,8 @@
             <label for="roleSwitch"><i class="fas fa-user-tag"></i> Switch Role:</label>
             <select id="roleSwitch" onchange="switchRole()" class="form-control">
                 <option value="Lecturer">Lecturer</option>
-                <option value="Coordinator">Coordinator</option>
-                <option value="Manager">Manager</option>
+                <option value="Coordinator">Programme Coordinator</option>
+                <option value="Manager">Academic Manager</option>
             </select>
         </div>
 
@@ -337,24 +337,19 @@
         <hr class="mt-20" />
 
         <!-- Role Views Inline -->
-       
-        <!--Lecturer View-->
-    <div id="lecturerView" class="role-view">
-        <h3><i class="fas fa-chalkboard-teacher"></i> Lecturer Dashboard</h3>
-        @await Html.PartialAsync("LectureDashboard")
-    </div>
-        
-        <!--Coordinator View-->
+        <div id="lecturerView" class="role-view">
+            <h3><i class="fas fa-chalkboard-teacher"></i> Lecturer Dashboard</h3>
+            @await Html.PartialAsync("LectureDashboard")
+        </div>
         <div id="coordinatorView" class="role-view hidden">
             <h3><i class="fas fa-user-cog"></i> Coordinator Dashboard</h3>
             @await Html.PartialAsync("CoordinatorDashboard")
         </div>
-
-        <!--Manager View-->
         <div id="managerView" class="role-view hidden">
             <h3><i class="fas fa-briefcase"></i> Manager Dashboard</h3>
             @await Html.PartialAsync("ManagerDashboard")
         </div>
+    </div>
 
     <script>
         function switchRole() {
