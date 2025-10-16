@@ -11,22 +11,21 @@
             <h2>Register</h2>
             <p>Create your account to access the dashboard.</p>
         </div>
-        <form asp-action="Register" method="post">
+        <form asp-controller="Account" asp-action="Register" method="post">
             <div class="form-group">
-                <input type="text" name="name" class="form-control" placeholder="Name" required />
+                <input type="text" name="FullName" class="form-control" placeholder="Full Name" required />
             </div>
             <div class="form-group">
-                <input type="email" name="email" class="form-control" placeholder="Email" required />
+                <input type="email" name="Email" class="form-control" placeholder="Email" required />
             </div>
             <div class="form-group">
-                <input type="password" name="password" class="form-control" placeholder="Password" required />
+                <input type="password" name="Password" class="form-control" placeholder="Password" required />
             </div>
             <div class="form-group">
-                <select name="role" class="form-control" required>
-                    <option value="">Select Role</option>
-                    <option value="Lecturer">Lecturer</option>
-                    <option value="Coordinator">Coordinator</option>
-                    <option value="Manager">Manager</option>
+                <select name="Role" class="form-control" required>
+                    <option value="Student">Student</option>
+                    <option value="Academic Coordinator">Academic Coordinator</option>
+                    <option value="Program Coordinator">Program Coordinator</option>
                 </select>
             </div>
             @if (ViewBag.Error != null)
@@ -36,7 +35,7 @@
             <button type="submit" class="btn btn-primary">Register</button>
         </form>
         <div class="auth-footer">
-            <span>Already have an account? <a href="@Url.Action("Index", "Home")">Login</a></span>
+            <span>Already have an account? <a href="@Url.Action("Login", "Account")">Login</a></span>
         </div>
     </div>
 </div>

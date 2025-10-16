@@ -1,12 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecturer Dashboard - CMCS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecturer Dashboard</title>
     <link rel="stylesheet" href="~/css/dashboard.css" />
-
-
     <style>
         * {
             margin: 0;
@@ -411,14 +409,80 @@
             background-color: #f8f9fa;
             border-radius: 6px;
             margin-bottom: 8px;
+            transition: all 0.3s ease;
         }
+
+            .file-item:hover {
+                background-color: #e9ecef;
+            }
+
+            .file-item .file-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex: 1;
+            }
+
+            .file-item .file-icon {
+                font-size: 18px;
+                color: #3498db;
+            }
+
+            .file-item .file-name {
+                font-weight: 500;
+                color: #2c3e50;
+            }
+
+            .file-item .file-size {
+                color: #7f8c8d;
+                font-size: 0.85rem;
+            }
 
             .file-item button {
                 background: none;
                 border: none;
                 color: #e74c3c;
                 cursor: pointer;
+                padding: 5px;
+                border-radius: 4px;
+                transition: background-color 0.3s;
             }
+
+                .file-item button:hover {
+                    background-color: rgba(231, 76, 60, 0.1);
+                }
+
+        .upload-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .upload-success {
+            background-color: #d1f7c4;
+            color: #27ae60;
+            border: 1px solid #2ecc71;
+        }
+
+        .upload-error {
+            background-color: #ffcfc6;
+            color: #c0392b;
+            border: 1px solid #e74c3c;
+        }
+
+        .upload-info {
+            background-color: #d6eaf8;
+            color: #2980b9;
+            border: 1px solid #3498db;
+        }
+
+        .file-requirements {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
 
         /* Responsive Design */
         @@media (max-width: 768px) {
@@ -452,135 +516,205 @@
     </style>
 </head>
 <body>
-    <!-- Dashboard Welcome -->
-    <div class="dashboard-welcome">
-        <h1><i class="fas fa-chalkboard-teacher"></i> Lecturer Dashboard</h1>
-        <p>Welcome, Lecturer! Manage your claims and track their status.</p>
-    </div>
+    <div class="container">
+        
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-        <div class="action-card">
-            <i class="fas fa-plus-circle"></i>
-            <h3>Submit New Claim</h3>
-            <p>Create and submit a new expense claim for your teaching activities.</p>
-            <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Submit Claim</button>
-        </div>
-        <div class="action-card">
-            <i class="fas fa-file-upload"></i>
-            <h3>Upload Documents</h3>
-            <p>Upload supporting documents for your existing claims.</p>
-            <button class="btn btn-primary" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload Documents</button>
-        </div>
-        <div class="action-card">
-            <i class="fas fa-history"></i>
-            <h3>Claim History</h3>
-            <p>View the status and history of all your submitted claims.</p>
-            <button class="btn btn-primary"><i class="fas fa-list"></i> View History</button>
-        </div>
-    </div>
-
-    <!-- Claims Status Overview -->
-    <div class="claims-status">
-        <div class="section-header">
-            <h2><i class="fas fa-chart-pie"></i> Claims Overview</h2>
-            <a href="#" class="btn btn-primary">View All</a>
+        <!-- Dashboard Welcome -->
+        <div class="dashboard-welcome">
+            <h1><i class="fas fa-chalkboard-teacher"></i> Lecturer Dashboard</h1>
+            <p>Welcome Lecture! Manage your claims and track their status.</p>
         </div>
 
-        <div class="status-cards">
-            <div class="status-card submitted">
-                <h3>4</h3>
-                <p>Total Claims</p>
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-card">
+                <i class="fas fa-plus-circle"></i>
+                <h3>Submit New Claim</h3>
+                <p>Create and submit a new expense claim for your teaching activities.</p>
+                <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Submit Claim</button>
             </div>
-
-            <div class="status-card pending">
-                <h3>1</h3>
-                <p>Pending</p>
+            <div class="action-card">
+                <i class="fas fa-file-upload"></i>
+                <h3>Upload Documents</h3>
+                <p>Upload supporting documents for your existing claims.</p>
+                <button class="btn btn-primary" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload Documents</button>
             </div>
-
-            <div class="status-card approved">
-                <h3>2</h3>
-                <p>Approved</p>
-            </div>
-
-            <div class="status-card rejected">
-                <h3>1</h3>
-                <p>Rejected</p>
+            <div class="action-card">
+                <i class="fas fa-history"></i>
+                <h3>Claim History</h3>
+                <p>View the status and history of all your submitted claims.</p>
+                <button class="btn btn-primary"><i class="fas fa-list"></i> View History</button>
             </div>
         </div>
-    </div>
 
-    <!-- Recent Claims -->
-    <div class="recent-claims">
-        <div class="section-header">
-            <h2><i class="fas fa-clock"></i> Recent Claims</h2>
-            <a href="#" class="btn btn-primary">View All</a>
+        <!-- Claims Status Overview -->
+        <div class="claims-status">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-pie"></i> Claims Overview</h2>
+                <a href="#" class="btn btn-primary">View All</a>
+            </div>
+
+            <div class="status-cards">
+                <div class="status-card submitted">
+                    <h3>4</h3>
+                    <p>Total Claims</p>
+                </div>
+
+                <div class="status-card pending">
+                    <h3>1</h3>
+                    <p>Pending</p>
+                </div>
+
+                <div class="status-card approved">
+                    <h3>2</h3>
+                    <p>Approved</p>
+                </div>
+
+                <div class="status-card rejected">
+                    <h3>1</h3>
+                    <p>Rejected</p>
+                </div>
+            </div>
         </div>
 
-        <table class="claims-table">
-            <thead>
-                <tr>
-                    <th>Claim ID</th>
-                    <th>Date Submitted</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Claim-005</td>
-                    <td>Aug 18, 2025</td>
-                    <td>Research Conference Travel</td>
-                    <td>R 11,500.00</td>
-                    <td><span class="status-badge status-pending">Pending Review</span></td>
-                    <td>
-                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Claim-006</td>
-                    <td>Aug 17, 2025</td>
-                    <td>Course Materials</td>
-                    <td>R 4,550.00</td>
-                    <td><span class="status-badge status-approved">Approved</span></td>
-                    <td>
-                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Claim-007</td>
-                    <td>Aug 16, 2025</td>
-                    <td>Software License Renewal</td>
-                    <td>R 7,400.00</td>
-                    <td><span class="status-badge status-approved">Paid</span></td>
-                    <td>
-                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Claim-008</td>
-                    <td>Aug 15, 2025</td>
-                    <td>Workshop Attendance</td>
-                    <td>R 6,500.00</td>
-                    <td><span class="status-badge status-rejected">Rejected</span></td>
-                    <td>
-                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- Recent Claims -->
+        <div class="recent-claims">
+            <div class="section-header">
+                <h2><i class="fas fa-clock"></i> Recent Claims</h2>
+                <a href="#" class="btn btn-primary">View All</a>
+            </div>
+
+            <table class="claims-table">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Date Submitted</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Claim-005</td>
+                        <td>Aug 18, 2025</td>
+                        <td>Research Conference Travel</td>
+                        <td>R 11,500.00</td>
+                        <td><span class="status-badge status-pending">Pending Review</span></td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Claim-006</td>
+                        <td>Aug 17, 2025</td>
+                        <td>Course Materials</td>
+                        <td>R 4,550.00</td>
+                        <td><span class="status-badge status-approved">Approved</span></td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Claim-007</td>
+                        <td>Aug 16, 2025</td>
+                        <td>Software License Renewal</td>
+                        <td>R 7,400.00</td>
+                        <td><span class="status-badge status-approved">Paid</span></td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Claim-008</td>
+                        <td>Aug 15, 2025</td>
+                        <td>Workshop Attendance</td>
+                        <td>R 6,500.00</td>
+                        <td><span class="status-badge status-rejected">Rejected</span></td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 14px;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Submit Claim Form (Within the Razor View) -->
+        <form id="claimForm" enctype="multipart/form-data" method="post" asp-controller="Claims" asp-action="Submit">
+            <div class="form-group">
+                <label for="claimTitle">Claim Title</label>
+                <input type="text" class="form-control" id="claimTitle" name="Title" placeholder="Enter claim title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="claimDate">Date of Expense</label>
+                <input type="date" class="form-control" id="claimDate" name="DateOfExpense" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hoursWorked">Hours Worked</label>
+                <input type="number" class="form-control" id="hoursWorked" name="HoursWorked" placeholder="Enter hours worked" min="0" step="0.5" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hourlyRate">Hourly Rate (R)</label>
+                <input type="number" class="form-control" id="hourlyRate" name="HourlyRate" placeholder="Enter hourly rate" min="0" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+                <label for="totalAmount">Total Amount (R)</label>
+                <input type="number" class="form-control" id="totalAmount" name="TotalAmount" placeholder="Calculated automatically" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="claimCategory">Category</label>
+                <select class="form-control" id="claimCategory" name="Category" required>
+                    <option value="">Select category</option>
+                    <option value="teaching">Teaching Hours</option>
+                    <option value="marking">Marking & Assessment</option>
+                    <option value="preparation">Course Preparation</option>
+                    <option value="consultation">Student Consultation</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="claimDescription">Additional Notes</label>
+                <textarea class="form-control" id="claimDescription" name="Notes" maxlength="500" placeholder="Describe the work performed or any additional information"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Supporting Documents</label>
+                <div class="file-upload" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click to upload documents or drag and drop</p>
+                    <p class="file-requirements">Accepted formats: PDF, DOCX, XLSX (Max 10MB per file)</p>
+                    <input type="file" id="fileInput" name="file" style="display: none" multiple accept=".pdf,.docx,.xlsx" required>
+                </div>
+
+                <div class="upload-status" id="uploadStatus"></div>
+
+                <div class="file-list" id="fileList">
+                    <!-- File items will be dynamically added here -->
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success" style="width: 100%;">
+                <i class="fas fa-paper-plane"></i> Submit Claim
+            </button>
+        </form>
+
+        <div id="claimStatus"></div>
     </div>
-    
 
     <!-- Submit Claim Modal -->
     <div id="claimModal" class="modal">
@@ -590,57 +724,66 @@
                 <span class="close" onclick="closeModal()">&times;</span>
             </div>
 
-            <form>
+            <form id="claimForm">
                 <div class="form-group">
                     <label for="claimTitle">Claim Title</label>
-                    <input type="text" class="form-control" id="claimTitle" placeholder="Enter claim title">
+                    <input type="text" class="form-control" id="claimTitle" placeholder="Enter claim title" required>
                 </div>
 
                 <div class="form-group">
                     <label for="claimDate">Date of Expense</label>
-                    <input type="date" class="form-control" id="claimDate">
+                    <input type="date" class="form-control" id="claimDate" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="claimAmount">Amount (R)</label>
-                    <input type="number" class="form-control" id="claimAmount" placeholder="Enter amount" step="0.01">
+                    <label for="hoursWorked">Hours Worked</label>
+                    <input type="number" class="form-control" id="hoursWorked" placeholder="Enter hours worked" min="0" step="0.5" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="hourlyRate">Hourly Rate (R)</label>
+                    <input type="number" class="form-control" id="hourlyRate" placeholder="Enter hourly rate" min="0" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="totalAmount">Total Amount (R)</label>
+                    <input type="number" class="form-control" id="totalAmount" placeholder="Calculated automatically" readonly>
                 </div>
 
                 <div class="form-group">
                     <label for="claimCategory">Category</label>
-                    <select class="form-control" id="claimCategory">
+                    <select class="form-control" id="claimCategory" required>
                         <option value="">Select category</option>
-                        <option value="travel">Travel Expenses</option>
-                        <option value="materials">Teaching Materials</option>
-                        <option value="conference">Conference Fees</option>
-                        <option value="research">Research Expenses</option>
+                        <option value="teaching">Teaching Hours</option>
+                        <option value="marking">Marking & Assessment</option>
+                        <option value="preparation">Course Preparation</option>
+                        <option value="consultation">Student Consultation</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="claimDescription">Description</label>
-                    <textarea class="form-control" id="claimDescription" placeholder="Describe the expense"></textarea>
+                    <label for="claimDescription">Additional Notes</label>
+                    <textarea class="form-control" id="claimDescription" placeholder="Describe the work performed or any additional information"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label>Supporting Documents</label>
-                    <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                    <div class="file-upload" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>Click to upload documents or drag and drop</p>
-                        <p class="small">Maximum file size: 10MB</p>
-                        <input type="file" id="fileInput" style="display: none" multiple>
+                        <p class="file-requirements">Accepted formats: PDF, DOCX, XLSX (Max 10MB per file)</p>
+                        <input type="file" id="fileInput" style="display: none" multiple accept=".pdf,.docx,.xlsx">
                     </div>
 
-                    <div class="file-list">
-                        <div class="file-item">
-                            <span>No files selected</span>
-                            <button type="button"><i class="fas fa-times"></i></button>
-                        </div>
+                    <div class="upload-status" id="uploadStatus"></div>
+
+                    <div class="file-list" id="fileList">
+                        <!-- File items will be dynamically added here -->
                     </div>
                 </div>
 
-                <button type="button" class="btn btn-success" style="width: 100%;" onclick="submitClaim()">
+                <button type="submit" class="btn btn-success" style="width: 100%;">
                     <i class="fas fa-paper-plane"></i> Submit Claim
                 </button>
             </form>
@@ -648,6 +791,20 @@
     </div>
 
     <script>
+        // File upload functionality
+        const fileInput = document.getElementById('fileInput');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileList = document.getElementById('fileList');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+        const ALLOWED_FILE_TYPES = ['application/pdf',
+                                   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+        const ALLOWED_FILE_EXTENSIONS = ['.pdf', '.docx', '.xlsx'];
+
+        // Store uploaded files
+        let uploadedFiles = [];
+
         // Modal functionality
         function openModal() {
             document.getElementById('claimModal').style.display = 'flex';
@@ -655,15 +812,251 @@
 
         function closeModal() {
             document.getElementById('claimModal').style.display = 'none';
+            document.getElementById('claimForm').reset();
+            document.getElementById('totalAmount').value = '';
+            // Clear file list when modal is closed
+            fileList.innerHTML = '';
+            uploadedFiles = [];
+            hideUploadStatus();
         }
 
         function openUploadModal() {
             alert('Document upload modal would open here.');
         }
 
-        function submitClaim() {
-            alert('Claim submitted successfully!');
-            closeModal();
+        // Calculate total amount when hours or rate changes
+        document.getElementById('hoursWorked').addEventListener('input', calculateTotal);
+        document.getElementById('hourlyRate').addEventListener('input', calculateTotal);
+
+        function calculateTotal() {
+            const hours = parseFloat(document.getElementById('hoursWorked').value) || 0;
+            const rate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const total = hours * rate;
+            document.getElementById('totalAmount').value = total.toFixed(2);
+        }
+
+        // File upload event listeners
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop functionality
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = '#3498db';
+            fileUploadArea.style.backgroundColor = '#f8f9fa';
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.style.borderColor = '#ddd';
+            fileUploadArea.style.backgroundColor = '';
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = '#ddd';
+            fileUploadArea.style.backgroundColor = '';
+
+            if (e.dataTransfer.files.length > 0) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        function handleFileSelect(e) {
+            if (e.target.files.length > 0) {
+                handleFiles(e.target.files);
+            }
+        }
+
+        function handleFiles(files) {
+            hideUploadStatus();
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                // Validate file type
+                if (!isValidFileType(file)) {
+                    showUploadStatus(`File "${file.name}" is not a supported format. Please upload PDF, DOCX, or XLSX files.`, 'error');
+                    continue;
+                }
+
+                // Validate file size
+                if (file.size > MAX_FILE_SIZE) {
+                    showUploadStatus(`File "${file.name}" exceeds the 10MB size limit.`, 'error');
+                    continue;
+                }
+
+                // Add file to the list
+                addFileToList(file);
+            }
+
+            // Reset file input to allow uploading the same file again
+            fileInput.value = '';
+        }
+
+        function isValidFileType(file) {
+            // Check by MIME type
+            if (ALLOWED_FILE_TYPES.includes(file.type)) {
+                return true;
+            }
+
+            // Check by file extension as fallback
+            const fileName = file.name.toLowerCase();
+            return ALLOWED_FILE_EXTENSIONS.some(ext => fileName.endsWith(ext));
+        }
+
+        function addFileToList(file) {
+            // Check if file already exists
+            if (uploadedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                showUploadStatus(`File "${file.name}" is already in the list.`, 'info');
+                return;
+            }
+
+            // Add to uploaded files array
+            uploadedFiles.push(file);
+
+            // Create file item element
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+
+            // Get file icon based on type
+            const fileIcon = getFileIcon(file);
+
+            // Format file size
+            const fileSize = formatFileSize(file.size);
+
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <span class="file-icon">${fileIcon}</span>
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${fileSize}</span>
+                </div>
+                <button type="button" onclick="removeFile('${file.name}', ${file.size})">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            fileList.appendChild(fileItem);
+            showUploadStatus(`File "${file.name}" added successfully.`, 'success');
+        }
+
+        function getFileIcon(file) {
+            if (file.type === 'application/pdf') {
+                return '<i class="fas fa-file-pdf"></i>';
+            } else if (file.type.includes('word') || file.name.toLowerCase().endsWith('.docx')) {
+                return '<i class="fas fa-file-word"></i>';
+            } else if (file.type.includes('sheet') || file.name.toLowerCase().endsWith('.xlsx')) {
+                return '<i class="fas fa-file-excel"></i>';
+            } else {
+                return '<i class="fas fa-file"></i>';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function removeFile(fileName, fileSize) {
+            // Remove from uploaded files array
+            uploadedFiles = uploadedFiles.filter(file => !(file.name === fileName && file.size === fileSize));
+
+            // Remove from DOM
+            const fileItems = fileList.querySelectorAll('.file-item');
+            fileItems.forEach(item => {
+                const nameElement = item.querySelector('.file-name');
+                if (nameElement && nameElement.textContent === fileName) {
+                    item.remove();
+                }
+            });
+
+            showUploadStatus(`File "${fileName}" removed.`, 'info');
+        }
+
+        function showUploadStatus(message, type) {
+            uploadStatus.textContent = message;
+            uploadStatus.className = 'upload-status';
+
+            switch (type) {
+                case 'success':
+                    uploadStatus.classList.add('upload-success');
+                    break;
+                case 'error':
+                    uploadStatus.classList.add('upload-error');
+                    break;
+                case 'info':
+                    uploadStatus.classList.add('upload-info');
+                    break;
+            }
+
+            uploadStatus.style.display = 'block';
+
+            // Auto hide after 5 seconds
+            setTimeout(hideUploadStatus, 5000);
+        }
+
+        function hideUploadStatus() {
+            uploadStatus.style.display = 'none';
+        }
+
+        // Handle form submission
+        document.getElementById('claimForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate that at least one file is uploaded
+            if (uploadedFiles.length === 0) {
+                showUploadStatus('Please upload at least one supporting document.', 'error');
+                return;
+            }
+
+            // Get form values
+            const title = document.getElementById('claimTitle').value;
+            const date = document.getElementById('claimDate').value;
+            const hours = document.getElementById('hoursWorked').value;
+            const rate = document.getElementById('hourlyRate').value;
+            const total = document.getElementById('totalAmount').value;
+            const category = document.getElementById('claimCategory').value;
+            const description = document.getElementById('claimDescription').value;
+
+            // In a real application, you would send this data to a server
+            // along with the uploaded files
+            console.log({
+                title,
+                date,
+                hours,
+                rate,
+                total,
+                category,
+                description,
+                files: uploadedFiles.map(f => f.name)
+            });
+
+            // Simulate file upload
+            simulateFileUpload()
+                .then(() => {
+                    // Show success message
+                    alert('Claim submitted successfully with ' + uploadedFiles.length + ' supporting document(s)!');
+                    closeModal();
+                })
+                .catch(error => {
+                    showUploadStatus('Error uploading files: ' + error.message, 'error');
+                });
+        });
+
+        // Simulate file upload (in a real app, this would be an API call)
+        function simulateFileUpload() {
+            return new Promise((resolve, reject) => {
+                // Simulate network delay
+                setTimeout(() => {
+                    // Randomly fail 10% of the time for demonstration
+                    if (Math.random() < 0.1) {
+                        reject(new Error('Network error during file upload'));
+                    } else {
+                        resolve();
+                    }
+                }, 1500);
+            });
         }
 
         // Close modal when clicking outside
@@ -673,6 +1066,18 @@
                 closeModal();
             }
         }
+
+        // Set today's date as default for the claim date
+        document.getElementById('claimDate').valueAsDate = new Date();
+
+        // SignalR for live updates
+        const connection = new signalR.HubConnectionBuilder().withUrl("/claimHub").build();
+        connection.on("ReceiveClaimStatusUpdate", function (claimId, status) {
+            // Update claim status in dashboard
+            document.getElementById("claimStatus").innerText = `Claim ${claimId} status: ${status}`;
+            // Optionally refresh claims table via AJAX
+        });
+        connection.start();
     </script>
 </body>
 </html>

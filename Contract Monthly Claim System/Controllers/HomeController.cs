@@ -1,12 +1,24 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Contract_Monthly_Claim_System.Hubs;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using AuthClaim = System.Security.Claims.Claim;
+using ContractClaim = Contract_Monthly_Claim_System.Models.Claim;
+using Contract_Monthly_Claim_System.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Contract_Monthly_Claim_System.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ApplicationDbContext _db;
+
+        public HomeController(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
         // GET: Home/Index (Login Page)
         public IActionResult Index()
         {
@@ -28,16 +40,18 @@ namespace Contract_Monthly_Claim_System.Controllers
             {
                 // Simulate user lookup and password check
                 // On success, sign in user
-                var claims = new List<Claim>
+                var claims = new List<AuthClaim>
                 {
-                    new Claim(ClaimTypes.Name, email),
-                    new Claim(ClaimTypes.Role, "Lecturer") // Default role for demo
+                    new AuthClaim(System.Security.Claims.ClaimTypes.Name, email),
+                    new AuthClaim(System.Security.Claims.ClaimTypes.Role, "Lecturer") // Default role for demo
                 };
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Use Identity's application scheme so we don't require registering a separate "Cookies" scheme.
+                var claimsIdentity = new System.Security.Claims.ClaimsIdentity(claims, IdentityConstants.ApplicationScheme);
 
                 await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity)
+                    IdentityConstants.ApplicationScheme,
+                    new System.Security.Claims.ClaimsPrincipal(claimsIdentity)
                 );
 
                 return RedirectToAction("Dashboard", "Home");
@@ -70,6 +84,16 @@ namespace Contract_Monthly_Claim_System.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
+
+            // Provide coordinator claims to the Dashboard view so its partial can render safely.
+            var coordinatorClaims = _db.Claims
+                .OrderByDescending(c => c.CreatedAt)
+                .Take(50)
+                .AsNoTracking()
+                .ToList();
+
+            ViewBag.CoordinatorClaims = coordinatorClaims;
+
             return View();
         }
 
@@ -77,7 +101,7 @@ namespace Contract_Monthly_Claim_System.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
             return RedirectToAction("Index", "Home");
         }
 
@@ -85,10 +109,19 @@ namespace Contract_Monthly_Claim_System.Controllers
         {
             return View();
         }
+
+        // Return CoordinatorDashboard with a model so direct requests don't hit a null Model.
         public IActionResult CoordinatorDashboard()
         {
-            return View();
+            var claims = _db.Claims
+                .OrderByDescending((ContractClaim c) => c.CreatedAt)
+                .Take(50)
+                .AsNoTracking()
+                .ToList();
+
+            return View(claims);
         }
+
         public IActionResult ManagerDashboard()
         {
             return View();

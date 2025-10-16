@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model IEnumerable<Contract_Monthly_Claim_System.Models.Claim>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -136,7 +138,7 @@
             }
 
             .stat-card.rejected i {
-                color: #3498db;
+                color: #e74c3c;
             }
 
             .stat-card h3 {
@@ -294,7 +296,7 @@
 
         .status-rejected {
             background-color: #ffcfc6;
-            color: #3498db;
+            color: #e74c3c;
         }
 
         .status-submitted {
@@ -323,7 +325,7 @@
         }
 
         .btn-danger {
-            background-color: #3498db;
+            background-color: #e74c3c;
             color: white;
         }
 
@@ -437,6 +439,49 @@
             border-top: 1px solid #eee;
         }
 
+        /* Claim Cards for Mobile View */
+        .claim-cards {
+            display: none;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .claim-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #f39c12;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .card-detail {
+            margin-bottom: 8px;
+        }
+
+            .card-detail label {
+                font-weight: 600;
+                color: #7f8c8d;
+                font-size: 0.9rem;
+            }
+
+            .card-detail span {
+                display: block;
+                margin-top: 3px;
+            }
+
         /* Responsive Design */
         @@media (max-width: 768px) {
             .header-nav
@@ -461,8 +506,11 @@
         }
 
         .claims-table {
-            display: block;
-            overflow-x: auto;
+            display: none;
+        }
+
+        .claim-cards {
+            display: grid;
         }
 
         .claim-details {
@@ -477,62 +525,11 @@
     </style>
 </head>
 <body>
-    
+    <div class="container">
         <!-- Dashboard Welcome -->
         <div class="dashboard-welcome">
             <h1><i class="fas fa-tasks"></i> Programme Coordinator Dashboard</h1>
             <p>Welcome, Programme Coordinator! Manage and approve claims from lecturers.</p>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="quick-stats">
-            <div class="stat-card pending">
-                <i class="fas fa-clock"></i>
-                <h3>8</h3>
-                <p>Pending Review</p>
-            </div>
-
-            <div class="stat-card reviewed">
-                <i class="fas fa-search"></i>
-                <h3>12</h3>
-                <p>Under Review</p>
-            </div>
-
-            <div class="stat-card approved">
-                <i class="fas fa-check-circle"></i>
-                <h3>23</h3>
-                <p>Approved</p>
-            </div>
-
-            <div class="stat-card rejected">
-                <i class="fas fa-times-circle"></i>
-                <h3>3</h3>
-                <p>Rejected</p>
-            </div>
-        </div>
-
-        <!-- Action Cards -->
-        <div class="action-cards">
-            <div class="action-card">
-                <i class="fas fa-clipboard-check"></i>
-                <h3>Review Claims</h3>
-                <p>Evaluate and approve or reject claims submitted by lecturers.</p>
-                <button class="btn btn-primary" onclick="showPendingClaims()"><i class="fas fa-list"></i> Review Claims</button>
-            </div>
-
-            <div class="action-card">
-                <i class="fas fa-file-import"></i>
-                <h3>Process Documents</h3>
-                <p>Manage and verify supporting documents for claims.</p>
-                <button class="btn btn-primary"><i class="fas fa-cog"></i> Process Documents</button>
-            </div>
-
-            <div class="action-card">
-                <i class="fas fa-chart-line"></i>
-                <h3>Generate Reports</h3>
-                <p>Create detailed reports on claim activities and statuses.</p>
-                <button class="btn btn-primary"><i class="fas fa-download"></i> Generate Reports</button>
-            </div>
         </div>
 
         <!-- Pending Claims -->
@@ -542,6 +539,7 @@
                 <a href="#" class="btn btn-primary">View All Claims</a>
             </div>
 
+            <!-- Desktop Table View -->
             <table class="claims-table">
                 <thead>
                     <tr>
@@ -555,181 +553,78 @@
                     </tr>
                 </thead>
                 <tbody>
+                @foreach (var claim in Model)
+                {
                     <tr>
-                        <td>Claim-005</td>
-                        <td>Dr. Thabo Mokoena</td>
-                        <td>Aug 18, 2025</td>
-                        <td>Research Conference Travel</td>
-                        <td>R 11,500.00</td>
-                        <td><span class="status-badge status-pending">Pending Review</span></td>
+                        <td>CLM-@claim.Id.ToString().PadLeft(3,'0')</td>
+                        <td>@claim.LecturerName</td>
+                        <td>@claim.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td>@claim.Notes</td>
+                        <td>@String.Format("R {0:N2}", claim.Total)</td>
+                        <td>
+                            <span class="status-badge @(claim.Status == "Pending" ? "status-pending" :
+                                                     claim.Status == "Approved" ? "status-approved" :
+                                                     claim.Status == "Rejected" ? "status-rejected" : "")">
+                                @claim.Status
+                            </span>
+                        </td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-success btn-sm" onclick="reviewClaim(005)"><i class="fas fa-check"></i> Approve</button>
-                                <button class="btn btn-danger btn-sm" onclick="rejectClaim(005)"><i class="fas fa-times"></i> Reject</button>
-                                <button class="btn btn-secondary btn-sm" onclick="viewClaim(005)"><i class="fas fa-eye"></i> View</button>
+                                <form asp-controller="Claims" asp-action="Approve" method="post" style="display:inline">
+                                    <input type="hidden" name="id" value="@claim.Id" />
+                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                </form>
+                                <form asp-controller="Claims" asp-action="Reject" method="post" style="display:inline; margin-left:6px">
+                                    <input type="hidden" name="id" value="@claim.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                                <a href="@Url.Action("Details","Claims", new { id = claim.Id })" class="btn btn-secondary btn-sm" style="margin-left:6px">View</a>
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td>Claim-006</td>
-                        <td>Prof. Zanele Khumalo</td>
-                        <td>Aug 17, 2025</td>
-                        <td>Course Materials</td>
-                        <td>R 4,550.00</td>
-                        <td><span class="status-badge status-review">Needs Verification</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-success btn-sm" onclick="reviewClaim(006)"><i class="fas fa-check"></i> Approve</button>
-                                <button class="btn btn-danger btn-sm" onclick="rejectClaim(006)"><i class="fas fa-times"></i> Reject</button>
-                                <button class="btn btn-secondary btn-sm" onclick="viewClaim(006)"><i class="fas fa-eye"></i> View</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Claim-007</td>
-                        <td>Dr. Lerato Dlamini</td>
-                        <td>Aug 16, 2025</td>
-                        <td>Software License Renewal</td>
-                        <td>R 7,400.00</td>
-                        <td><span class="status-badge status-pending">Pending Review</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-success btn-sm" onclick="reviewClaim(007)"><i class="fas fa-check"></i> Approve</button>
-                                <button class="btn btn-danger btn-sm" onclick="rejectClaim(007)"><i class="fas fa-times"></i> Reject</button>
-                                <button class="btn btn-secondary btn-sm" onclick="viewClaim(007)"><i class="fas fa-eye"></i> View</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Claim-008</td>
-                        <td>Dr. Sipho Nkosi</td>
-                        <td>Aug 15, 2025</td>
-                        <td>Workshop Attendance</td>
-                        <td>R 6,500.00</td>
-                        <td><span class="status-badge status-review">Documents Requested</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-success btn-sm" onclick="reviewClaim(008)"><i class="fas fa-check"></i> Approve</button>
-                                <button class="btn btn-danger btn-sm" onclick="rejectClaim(008)"><i class="fas fa-times"></i> Reject</button>
-                                <button class="btn btn-secondary btn-sm" onclick="viewClaim(008)"><i class="fas fa-eye"></i> View</button>
-                            </div>
-                        </td>
-                    </tr>
+                }
                 </tbody>
             </table>
-        </div>
-    </div>
 
-    <!-- Claim Detail Modal -->
-    <div id="claimModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-file-invoice-dollar"></i> Claim Details - CLM-<span id="claimId"></span></h2>
-                <span class="close" onclick="closeModal()">&times;</span>
-            </div>
-
-            <div class="claim-details">
-                <div class="detail-group">
-                    <label>Lecturer</label>
-                    <span id="claimLecturer">Dr. Thabo Mokoena</span>
-                </div>
-
-                <div class="detail-group">
-                    <label>Department</label>
-                    <span id="claimDepartment">Computer Science</span>
-                </div>
-
-                <div class="detail-group">
-                    <label>Submission Date</label>
-                    <span id="claimDate">October 18, 2023</span>
-                </div>
-
-                <div class="detail-group">
-                    <label>Category</label>
-                    <span id="claimCategory">Travel Expenses</span>
-                </div>
-
-                <div class="detail-group">
-                    <label>Amount</label>
-                    <span id="claimAmount">R 11,500.00</span>
-                </div>
-
-                <div class="detail-group">
-                    <label>Status</label>
-                    <span id="claimStatus"><span class="status-badge status-pending">Pending Review</span></span>
-                </div>
-            </div>
-
-            <div class="detail-group">
-                <label>Description</label>
-                <span id="claimDescription">Expenses for attending the International Research Conference on Computer Science in Cape Town. Includes flight, accommodation, and conference fee.</span>
-            </div>
-
-            <div class="documents-list">
-                <h3><i class="fas fa-file-pdf"></i> Supporting Documents</h3>
-
-                <div class="document-item">
-                    <a href="#"><i class="fas fa-download"></i> Conference_Registration.pdf</a>
-                    <span>2.4 MB</span>
-                </div>
-
-                <div class="document-item">
-                    <a href="#"><i class="fas fa-download"></i> Flight_Receipt.pdf</a>
-                    <span>1.1 MB</span>
-                </div>
-
-                <div class="document-item">
-                    <a href="#"><i class="fas fa-download"></i> Hotel_Invoice.pdf</a>
-                    <span>1.8 MB</span>
-                </div>
-            </div>
-
-            <div class="modal-actions">
-                <button class="btn btn-danger" onclick="rejectClaim()"><i class="fas fa-times"></i> Reject Claim</button>
-                <button class="btn btn-success" onclick="approveClaim()"><i class="fas fa-check"></i> Approve Claim</button>
-                <button class="btn btn-secondary" onclick="requestDocuments()"><i class="fas fa-file-import"></i> Request More Documents</button>
+            <!-- Mobile Card View (kept minimal here) -->
+            <div class="claim-cards">
+                @foreach (var claim in Model)
+                {
+                    <div class="claim-card">
+                        <div class="card-header">
+                            <h3>CLM-@claim.Id.ToString().PadLeft(3,'0')</h3>
+                            <span class="status-badge">@claim.Status</span>
+                        </div>
+                        <div class="card-details">
+                            <div class="card-detail"><label>Lecturer</label><span>@claim.LecturerName</span></div>
+                            <div class="card-detail"><label>Date</label><span>@claim.CreatedAt.ToString("MMM dd, yyyy")</span></div>
+                            <div class="card-detail"><label>Amount</label><span>@String.Format("R {0:N2}", claim.Total)</span></div>
+                        </div>
+                        <div class="action-buttons">
+                            <form asp-controller="Claims" asp-action="Approve" method="post" style="display:inline">
+                                <input type="hidden" name="id" value="@claim.Id" />
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form asp-controller="Claims" asp-action="Reject" method="post" style="display:inline; margin-left:6px">
+                                <input type="hidden" name="id" value="@claim.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
+
     </div>
 
+    <script src="~/lib/signalr/signalr.js"></script>
     <script>
-        // Modal functionality
-        function viewClaim(claimId) {
-            document.getElementById('claimId').textContent = claimId.toString().padStart(4, '0');
-            document.getElementById('claimModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('claimModal').style.display = 'none';
-        }
-
-        function approveClaim() {
-            alert('Claim approved successfully! ');
-            closeModal();
-        }
-
-        function rejectClaim() {
-            alert('Claim rejected.');
-            closeModal();
-        }
-
-        function requestDocuments() {
-            alert('Document request sent to lecturer. ');
-            closeModal();
-        }
-
-        function showPendingClaims() {
-            const pendingSection = document.querySelector('.pending-claims');
-            pendingSection.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('claimModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
+        const connection = new signalR.HubConnectionBuilder().withUrl("/claimHub").build();
+        connection.on("ReceiveClaimStatusUpdate", function (claimId, status) {
+            // Optionally refresh claims table via AJAX or reload
+            location.reload();
+        });
+        connection.start();
     </script>
 </body>
 </html>
