@@ -1,8 +1,13 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Contract_Monthly_Claim_System.Data;
 using Contract_Monthly_Claim_System.Hubs;
 using Contract_Monthly_Claim_System.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +32,7 @@ namespace Contract_Monthly_Claim_System.Controllers
         }
 
         // GET: /Claims/Create
-        [Authorize(Roles = "Student")]
+        [Authorize(Roles = "Lecturer")]
         public IActionResult Create()
         {
             return View();
@@ -44,7 +49,7 @@ namespace Contract_Monthly_Claim_System.Controllers
         // POST: /Claims/Submit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Student")]
+        [Authorize(Roles = "Lecturer")]
         public async Task<IActionResult> Submit([FromForm] ClaimSubmitModel model)
         {
             if (model.HoursWorked <= 0 || model.HourlyRate < 0)
@@ -68,7 +73,7 @@ namespace Contract_Monthly_Claim_System.Controllers
                     return RedirectToAction("LectureDashboard", "Home");
                 }
 
-                var documentsFolder = Path.Combine(_env.WebRootPath, "Documents");
+                var documentsFolder = Path.Combine(_env.WebRootPath ?? "wwwroot", "Documents");
                 if (!Directory.Exists(documentsFolder)) Directory.CreateDirectory(documentsFolder);
 
                 var fileName = $"{Guid.NewGuid()}{ext}";
@@ -82,7 +87,7 @@ namespace Contract_Monthly_Claim_System.Controllers
 
             var claim = new Claim
             {
-                StudentId = user.Id,
+                LecturerUserId = user.Id,
                 LecturerName = user.FullName ?? user.Email,
                 HoursWorked = model.HoursWorked,
                 HourlyRate = model.HourlyRate,
@@ -104,14 +109,14 @@ namespace Contract_Monthly_Claim_System.Controllers
         }
 
         // GET: /Claims/MyClaims
-        [Authorize(Roles = "Student")]
+        [Authorize(Roles = "Lecturer")]
         public async Task<IActionResult> MyClaims()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Forbid();
 
             var claims = await _db.Claims
-                .Where(c => c.StudentId == user.Id)
+                .Where(c => c.LecturerUserId == user.Id)
                 .OrderByDescending(c => c.CreatedAt)
                 .AsNoTracking()
                 .ToListAsync();
@@ -144,7 +149,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             await _db.SaveChangesAsync();
 
             await _hub.Clients.Group("coordinators").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
-            await _hub.Clients.Group($"user-{claim.StudentId}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
+            await _hub.Clients.Group($"user-{claim.LecturerUserId}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
 
             return RedirectToAction("ViewClaims");
         }
@@ -162,7 +167,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             await _db.SaveChangesAsync();
 
             await _hub.Clients.Group("coordinators").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
-            await _hub.Clients.Group($"user-{claim.StudentId}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
+            await _hub.Clients.Group($"user-{claim.LecturerUserId}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
 
             return RedirectToAction("ViewClaims");
         }
@@ -172,13 +177,13 @@ namespace Contract_Monthly_Claim_System.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var claim = await _db.Claims
-                .Include(c => c.Student)
+                .Include(c => c.LecturerUser)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (claim == null) return NotFound();
 
-            // Simple authorization: students can view only their claims; coordinators can view any.
-            if (User.IsInRole("Student") && claim.StudentId != _userManager.GetUserId(User))
+            // Simple authorization: lecturers can view only their claims; coordinators can view any.
+            if (User.IsInRole("Lecturer") && claim.LecturerUserId != _userManager.GetUserId(User))
                 return Forbid();
 
             return View(claim);

@@ -14,6 +14,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+// required so _ViewStart can inject IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+
 // Add Identity with roles
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
@@ -41,7 +44,7 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    string[] roles = new[] { "Student", "Academic Coordinator", "Program Coordinator" };
+    string[] roles = new[] { "Lecturer", "Academic Coordinator", "Program Coordinator" };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))

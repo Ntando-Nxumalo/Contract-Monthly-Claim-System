@@ -12,16 +12,34 @@
             <p>Enter your credentials to access the dashboard.</p>
         </div>
         <form asp-controller="Account" asp-action="Login" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="ReturnUrl" value="@(ViewData["ReturnUrl"] ?? "")" />
             <div class="form-group">
                 <input type="email" name="Email" class="form-control" placeholder="Email" required />
             </div>
             <div class="form-group">
                 <input type="password" name="Password" class="form-control" placeholder="Password" required />
             </div>
+
+            @* Show server-side errors so user sees why login failed *@
             @if (ViewBag.Error != null)
             {
                 <div class="error-message">@ViewBag.Error</div>
             }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="error-message">
+                    @foreach (var entry in ViewData.ModelState.Values)
+                    {
+                        foreach (var error in entry.Errors)
+                        {
+                            <div>@error.ErrorMessage</div>
+                        }
+                    }
+                </div>
+            }
+
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
         <div class="auth-footer">

@@ -142,7 +142,7 @@ namespace Contract_Monthly_Claim_System.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Claims");
+                    b.ToTable("Claims", (string)null);
                 });
 
             modelBuilder.Entity("Contract_Monthly_Claim_System.Models.Lecturer", b =>
@@ -170,7 +170,7 @@ namespace Contract_Monthly_Claim_System.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Lecturers");
+                    b.ToTable("Lecturers", (string)null);
 
                     b.HasData(
                         new

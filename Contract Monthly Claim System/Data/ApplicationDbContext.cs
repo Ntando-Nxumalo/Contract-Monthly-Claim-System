@@ -20,17 +20,9 @@ namespace Contract_Monthly_Claim_System.Data
         {
             base.OnModelCreating(builder);
 
-            // Configure Claim entity defaults
-            builder.Entity<Claim>(b =>
-            {
-                b.Property(p => p.Status).HasMaxLength(50).HasDefaultValue("Pending");
-                b.Property(p => p.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
-            });
-
-            // Minimal seed (optional) - update as needed
-            builder.Entity<Lecturer>().HasData(
-                new Lecturer { Id = 1, Name = "Dr. Sarah Johnson", Email = "sarah@uni.edu", Role = "Lecturer" }
-            );
+            // Optional: explicitly map to table name if needed
+            builder.Entity<Claim>().ToTable("Claims");
+            builder.Entity<Lecturer>().ToTable("Lecturers");
         }
     }
 }

@@ -1,6 +1,9 @@
-﻿@{
-    var path = Context.Request.Path.Value ?? "";
-    if (path.Contains("Account/Login") || path.Contains("Account/Register"))
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var path = HttpContextAccessor.HttpContext?.Request.Path.Value ?? "";
+    if (path.Contains("/Account/Login") || path.Contains("/Account/Register"))
     {
         Layout = "_AuthLayout"; // no nav
     }

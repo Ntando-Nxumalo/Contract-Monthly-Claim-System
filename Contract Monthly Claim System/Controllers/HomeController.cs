@@ -86,16 +86,16 @@ namespace Contract_Monthly_Claim_System.Controllers
             }
 
             // Provide coordinator claims to the Dashboard view so its partial can render safely.
-            var coordinatorClaims = _db.Claims
+           var coordinatorClaims = _db.Claims
                 .OrderByDescending(c => c.CreatedAt)
                 .Take(50)
                 .AsNoTracking()
-                .ToList();
+                .ToList(); 
 
-            ViewBag.CoordinatorClaims = coordinatorClaims;
+            ViewBag.CoordinatorClaims = coordinatorClaims; 
 
             return View();
-        }
+        } 
 
         // Logout
         [HttpPost]
