@@ -1,0 +1,72 @@
+@model IEnumerable<Contract_Monthly_Claim_System.Models.Claim>
+@{
+    ViewData["Title"] = "My Claims";
+}
+<div class="container">
+    <div class="header-nav">
+        <h2>My Claims</h2>
+        <div class="nav-menu">
+            <a href="/Home/Dashboard" class="active">Dashboard</a>
+            <span class="separator">|</span>
+            <a href="/Claims/MyClaims">My Claims</a>
+        </div>
+    </div>
+
+    <div class="recent-claims">
+        <div class="section-header">
+            <h2>Submitted Claims</h2>
+        </div>
+        <table class="claims-table">
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Date</th>
+                    <th>Hours</th>
+                    <th>Rate (R)</th>
+                    <th>Total (R)</th>
+                    <th>Status</th>
+                    <th>Documents</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var claim in Model)
+            {
+                <tr>
+                    <td>CLM-@claim.Id.ToString().PadLeft(3,'0')</td>
+                    <td>@claim.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</td>
+                    <td>@claim.HoursWorked</td>
+                    <td>@String.Format("{0:N2}", claim.HourlyRate)</td>
+                    <td>@String.Format("{0:N2}", claim.Total)</td>
+                    <td>
+                        <span id="claim-status-@claim.Id" class="status-badge @(claim.Status == "Pending" ? "status-pending" : claim.Status == "Approved" ? "status-approved" : claim.Status == "Rejected" ? "status-rejected" : "")">@claim.Status</span>
+                    </td>
+                    <td>
+                        @if (claim.Documents != null && claim.Documents.Any())
+                        {
+                            foreach (var d in claim.Documents)
+                            {
+                                <a href="@Url.Action("DownloadDocument", "Claims", new { id = d.Id })">@d.FileName</a><text> </text>
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(claim.DocumentPath))
+                        {
+                            <a href="@claim.DocumentPath" target="_blank">Document</a>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+const connection = new signalR.HubConnectionBuilder().withUrl("/claimHub").build();
+connection.on("ReceiveClaimStatusUpdate", function (claimId, status) {
+    const el = document.getElementById('claim-status-' + claimId);
+    if (el) {
+        el.textContent = status;
+        el.className = 'status-badge ' + (status === 'Pending' ? 'status-pending' : status === 'Approved' ? 'status-approved' : status === 'Rejected' ? 'status-rejected' : '');
+    }
+});
+connection.start().catch(e => console.error(e));
+</script>

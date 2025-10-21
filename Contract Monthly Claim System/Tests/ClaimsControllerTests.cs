@@ -5,6 +5,7 @@ using Contract_Monthly_Claim_System.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -154,6 +155,135 @@ namespace Contract_Monthly_Claim_System.Tests
             var updated = await db.Claims.FindAsync(claim.Id);
             Assert.NotNull(updated);
             Assert.Equal("Rejected", updated!.Status);
+        }
+
+        [Fact]
+        public async Task Submit_InvalidModel_RedirectsWithError()
+        {
+            var db = GetDbContext(nameof(Submit_InvalidModel_RedirectsWithError));
+            var userManagerMock = GetUserManagerMock();
+            var hubMock = GetHubContextMock();
+            var envMock = GetEnvMock();
+
+            var controller = new ClaimsController(db, envMock.Object, hubMock.Object, userManagerMock.Object);
+
+            var testUser = new ApplicationUser { UserName = "lect@example.com", Email = "lect@example.com", FullName = "Lecturer", Id = "lect-1" };
+            userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+                .ReturnsAsync(testUser);
+
+            var model = new ClaimsController.ClaimSubmitModel
+            {
+                HoursWorked = 0,
+                HourlyRate = 100,
+                Notes = "x"
+            };
+
+            var result = await controller.Submit(model);
+
+            Assert.IsType<Microsoft.AspNetCore.Mvc.RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public async Task Submit_DocumentFiltering_SavesOnlyAllowed()
+        {
+            var db = GetDbContext(nameof(Submit_DocumentFiltering_SavesOnlyAllowed));
+            var userManagerMock = GetUserManagerMock();
+            var hubMock = GetHubContextMock();
+            var envMock = GetEnvMock();
+
+            var controller = new ClaimsController(db, envMock.Object, hubMock.Object, userManagerMock.Object);
+
+            var testUser = new ApplicationUser { UserName = "lect@example.com", Email = "lect@example.com", FullName = "Lecturer", Id = "lect-1" };
+            userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+                .ReturnsAsync(testUser);
+
+            var goodPdf = CreateFormFile("allowed.pdf", "pdf-data");
+            var badExe = CreateFormFile("notallowed.exe", "exe-data");
+
+            var model = new ClaimsController.ClaimSubmitModel
+            {
+                HoursWorked = 2,
+                HourlyRate = 100,
+                Notes = "docs",
+                Documents = new System.Collections.Generic.List<IFormFile> { goodPdf, badExe }
+            };
+
+            var result = await controller.Submit(model);
+
+            var saved = await db.Claims.Include(c => c.Documents).FirstOrDefaultAsync();
+            Assert.NotNull(saved);
+            Assert.Single(saved!.Documents);
+            Assert.EndsWith(".pdf", saved.Documents.First().FilePath);
+        }
+
+        [Fact]
+        public async Task DownloadDocument_AllowsOwnerAndCoordinator()
+        {
+            var db = GetDbContext(nameof(DownloadDocument_AllowsOwnerAndCoordinator));
+            var userManagerMock = GetUserManagerMock();
+            var hubMock = GetHubContextMock();
+            var envMock = GetEnvMock();
+
+            var controller = new ClaimsController(db, envMock.Object, hubMock.Object, userManagerMock.Object);
+
+            var claim = new Claim { LecturerUserId = "lect-1", LecturerName = "L", HoursWorked = 1, HourlyRate = 100, Total = 100, Status = "Pending" };
+            db.Claims.Add(claim);
+            await db.SaveChangesAsync();
+
+            var root = envMock.Object.WebRootPath;
+            var docs = System.IO.Path.Combine(root, "Documents");
+            if (!Directory.Exists(docs)) Directory.CreateDirectory(docs);
+            var fileName = Guid.NewGuid().ToString() + ".pdf";
+            var physical = System.IO.Path.Combine(docs, fileName);
+            await System.IO.File.WriteAllTextAsync(physical, "data");
+
+            var doc = new ClaimDocument { ClaimId = claim.Id, FileName = "file.pdf", FilePath = "/Documents/" + fileName };
+            db.ClaimDocuments.Add(doc);
+            await db.SaveChangesAsync();
+
+            var ownerUser = new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity(new[]
+            {
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, "lect-1"),
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, "Lecturer")
+            }, IdentityConstants.ApplicationScheme));
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = ownerUser }
+            };
+
+            var fileResult = await controller.DownloadDocument(doc.Id);
+            Assert.IsType<FileContentResult>(fileResult);
+
+            var coordUser = new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity(new[]
+            {
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, "coord-1"),
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, "Program Coordinator")
+            }, IdentityConstants.ApplicationScheme));
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = coordUser }
+            };
+
+            var fileResult2 = await controller.DownloadDocument(doc.Id);
+            Assert.IsType<FileContentResult>(fileResult2);
+        }
+
+        private static IFormFile CreateFormFile(string name, string content)
+        {
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes(content));
+            var fileMock = new Mock<IFormFile>();
+            fileMock.Setup(f => f.OpenReadStream()).Returns(ms);
+            fileMock.Setup(f => f.FileName).Returns(name);
+            fileMock.Setup(f => f.Length).Returns(ms.Length);
+            fileMock.Setup(f => f.CopyToAsync(It.IsAny<Stream>(), default)).Returns((Stream s, System.Threading.CancellationToken t) =>
+            {
+                ms.Position = 0;
+                ms.CopyTo(s);
+                return Task.CompletedTask;
+            });
+            return fileMock.Object;
         }
     }
 }

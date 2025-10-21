@@ -40,7 +40,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied"; // <- changed: point to AccessDenied page
 });
 
 builder.Services.AddControllersWithViews();
@@ -54,16 +54,22 @@ var env = app.Services.GetRequiredService<IWebHostEnvironment>();
 var documentsFolder = Path.Combine(env.WebRootPath ?? "wwwroot", "Documents");
 if (!Directory.Exists(documentsFolder)) Directory.CreateDirectory(documentsFolder);
 
-// Seed roles at startup - guard with try/catch and log errors to help fail fast with visible stack trace
+// Apply pending EF Core migrations and then seed roles/users at startup.
+// Guard with try/catch to log and fail visibly when migration/seeding fails.
 using (var scope = app.Services.CreateScope())
 {
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
+        // Ensure database exists and apply any pending migrations (creates ClaimDocuments table).
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        string[] roles = new[] { "Lecturer", "Academic Coordinator", "Program Coordinator" };
+        // Ensure role names match Authorize attributes in controllers.
+        string[] roles = new[] { "Lecturer", "Program Coordinator", "Academic Manager" };
         foreach (var role in roles)
         {
             if (!await roleManager.RoleExistsAsync(role))
@@ -100,7 +106,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger2 = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger2.LogError(ex, "Error while seeding roles/users");
+        logger2.LogError(ex, "Error while migrating or seeding database");
         throw;
     }
 }

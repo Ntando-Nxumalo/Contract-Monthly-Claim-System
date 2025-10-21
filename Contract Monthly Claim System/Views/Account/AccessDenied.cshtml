@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+<link rel="stylesheet" href="~/css/auth.css" />
+<div class="auth-page-center">
+    <div class="auth-container">
+        <div class="auth-header">
+            <h2>Access Denied</h2>
+            <p>You do not have permission to access this resource.</p>
+        </div>
+        <div class="form-group">
+            @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl as string))
+            {
+                <a class="btn btn-primary" href="@ViewBag.ReturnUrl">Go Back</a>
+            }
+            <a class="btn btn-secondary" style="margin-left:8px" href="@Url.Action("Dashboard","Home")">Go to Dashboard</a>
+        </div>
+    </div>
+</div>

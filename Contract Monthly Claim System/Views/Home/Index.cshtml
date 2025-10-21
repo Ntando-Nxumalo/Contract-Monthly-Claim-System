@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = "_AuthLayout";
     ViewData["Title"] = "Login";
 }
@@ -21,15 +21,15 @@
                 <input type="password" name="Password" class="form-control" placeholder="Password" required />
             </div>
 
-            @* Show server-side errors so user sees why login failed *@
+            @* Show server-side errors as Bootstrap alerts *@
             @if (ViewBag.Error != null)
             {
-                <div class="error-message">@ViewBag.Error</div>
+                <div class="alert alert-danger" role="alert">@ViewBag.Error</div>
             }
 
             @if (!ViewData.ModelState.IsValid)
             {
-                <div class="error-message">
+                <div class="alert alert-danger" role="alert">
                     @foreach (var entry in ViewData.ModelState.Values)
                     {
                         foreach (var error in entry.Errors)

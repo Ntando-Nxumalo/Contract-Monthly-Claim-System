@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,8 +31,12 @@ namespace Contract_Monthly_Claim_System.Models
         [MaxLength(500)]
         public string? Notes { get; set; }
 
+        // kept for backward-compatibility (first/single document)
         [MaxLength(500)]
         public string? DocumentPath { get; set; }
+
+        // Navigation for multiple documents
+        public ICollection<ClaimDocument> Documents { get; set; } = new List<ClaimDocument>();
 
         [Required, MaxLength(50)]
         public string Status { get; set; } = "Pending";

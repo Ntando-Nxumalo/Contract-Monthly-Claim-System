@@ -1,0 +1,57 @@
+@model IEnumerable<Contract_Monthly_Claim_System.Models.Claim>
+@{
+    ViewData["Title"] = "Claims Review";
+}
+<div class="container">
+    <div class="header-nav">
+        <h2>Claims Review</h2>
+        <div class="nav-menu">
+            <a href="/Home/Dashboard">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="pending-claims">
+        <div class="section-header">
+            <h2>Pending Claims</h2>
+        </div>
+        <table class="claims-table">
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Lecturer</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="claims-body">
+                @foreach (var claim in Model)
+                {
+                    @await Html.PartialAsync("_ClaimRow", claim)
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// On status update, re-fetch the single row partial for precision & reliability
+const connection = new signalR.HubConnectionBuilder().withUrl("/claimHub").build();
+connection.on("ReceiveClaimStatusUpdate", function (claimId, status) {
+    fetch(`/Claims/Row/${claimId}`)
+        .then(r => r.text())
+        .then(html => {
+            const tmp = document.createElement('tbody');
+            tmp.innerHTML = html.trim();
+            const newRow = tmp.querySelector('tr');
+            const oldRow = document.getElementById('claim-row-' + claimId);
+            if (newRow && oldRow && oldRow.parentNode) {
+                oldRow.parentNode.replaceChild(newRow, oldRow);
+            }
+        })
+        .catch(err => console.error('Row refresh failed', err));
+});
+connection.start().catch(e => console.error(e));
+</script>

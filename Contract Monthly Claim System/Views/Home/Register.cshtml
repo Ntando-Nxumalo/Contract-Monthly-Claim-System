@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = "_AuthLayout";
     ViewData["Title"] = "Registration"; 
 }
@@ -28,13 +28,13 @@
             <div class="form-group">
                 <select name="Role" class="form-control" required>
                     <option value="Lecturer">Lecturer</option>
-                    <option value="Academic Coordinator">Academic Coordinator</option>
                     <option value="Program Coordinator">Program Coordinator</option>
+                    <option value="Academic Manager">Academic Manager</option>
                 </select>
             </div>
             @if (ViewBag.Error != null)
             {
-                <div class="error-message">@ViewBag.Error</div>
+                <div class="alert alert-danger" role="alert">@ViewBag.Error</div>
             }
             <button type="submit" class="btn btn-primary">Register</button>
         </form>

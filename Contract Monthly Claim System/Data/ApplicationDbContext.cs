@@ -15,6 +15,7 @@ namespace Contract_Monthly_Claim_System.Data
         // Domain sets
         public DbSet<Claim> Claims { get; set; } = null!;
         public DbSet<Lecturer> Lecturers { get; set; } = null!;
+        public DbSet<ClaimDocument> ClaimDocuments { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -23,6 +24,14 @@ namespace Contract_Monthly_Claim_System.Data
             // Optional: explicitly map to table name if needed
             builder.Entity<Claim>().ToTable("Claims");
             builder.Entity<Lecturer>().ToTable("Lecturers");
+            builder.Entity<ClaimDocument>().ToTable("ClaimDocuments");
+
+            // Relationship
+            builder.Entity<ClaimDocument>()
+                   .HasOne(d => d.Claim)
+                   .WithMany(c => c.Documents)
+                   .HasForeignKey(d => d.ClaimId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@* 
+@* 
 *@
 
 @using System.Linq
@@ -9,28 +9,7 @@
     // ensure coordinator partial always receives a non-null model
     var coordinatorClaims = ViewBag.CoordinatorClaims as IEnumerable<Claim> ?? Enumerable.Empty<Claim>();
 }
-<link rel="stylesheet" href="~/css/dashboard.css" />
-
 <div class="container">
-    <!-- Header Navigation -->
-    <div class="header-nav">
-        <h2><i class="fas fa-file-contract"></i> CMCS</h2>
-        <div class="nav-menu">
-            <a href="/Home/Dashboard" class="active"><i class="fas fa-th-large"></i> Dashboard</a>
-            <span class="separator">|</span>
-            <a href="/Claims/MyClaims"><i class="fas fa-clipboard-list"></i> My Claims</a>
-            <span class="separator">|</span>
-            <a href="/Documents"><i class="fas fa-file-alt"></i> Documents</a>
-            <span class="separator">|</span>
-            <a href="/Account/Settings"><i class="fas fa-cog"></i> Settings</a>
-            <span class="separator">|</span>
-            <form asp-action="Logout" method="post" style="display:inline;">
-                <button type="submit" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </form>
-        </div>
-    </div>
 
     <!-- Dashboard Welcome Section -->
     <div class="dashboard-welcome">
@@ -41,10 +20,10 @@
     <!-- Role Switcher -->
     <div class="role-switcher">
         <label for="roleSwitch"><i class="fas fa-user-tag"></i> Switch Role:</label>
-        <select id="roleSwitch" onchange="switchRole()" class="form-control">
+        <select id="roleSwitch" onchange="onRoleChange()" class="form-control">
             <option value="Lecturer">Lecturer</option>
-            <option value="Coordinator">Programme Coordinator</option>
-            <option value="Manager">Academic Manager</option>
+            <option value="Program Coordinator">Program Coordinator</option>
+            <option value="Academic Manager">Academic Manager</option>
         </select>
     </div>
 
@@ -53,7 +32,7 @@
     <!-- Role Views Inline (only one visible at a time) -->
     <div id="lecturerView" class="role-view">
         <h3><i class="fas fa-chalkboard-teacher"></i> Lecturer Dashboard</h3>
-        @await Html.PartialAsync("LectureDashboard")
+        @await Html.PartialAsync("LectureDashboard", (IEnumerable<Claim>)ViewBag.LecturerClaims)
     </div>
     <div id="coordinatorView" class="role-view hidden">
         <h3><i class="fas fa-user-cog"></i> Coordinator Dashboard</h3>
@@ -62,32 +41,29 @@
     </div>
     <div id="managerView" class="role-view hidden">
         <h3><i class="fas fa-briefcase"></i> Manager Dashboard</h3>
-        @await Html.PartialAsync("ManagerDashboard")
+        @await Html.PartialAsync("ManagerDashboard", (IEnumerable<Claim>)ViewBag.ManagerClaims)
     </div>
 </div>
-
 <script>
-    // Switches visible dashboard based on selected role
-    function switchRole() {
-        let role = document.getElementById("roleSwitch").value;
+    // Show default role view on page load (client-side only; switching actually logs out)
+    function switchRoleView(role) {
         document.querySelectorAll(".role-view").forEach(v => v.classList.add("hidden"));
         if (role === "Lecturer") document.getElementById("lecturerView").classList.remove("hidden");
-        if (role === "Coordinator") document.getElementById("coordinatorView").classList.remove("hidden");
-        if (role === "Manager") document.getElementById("managerView").classList.remove("hidden");
+        if (role === "Program Coordinator") document.getElementById("coordinatorView").classList.remove("hidden");
+        if (role === "Academic Manager") document.getElementById("managerView").classList.remove("hidden");
     }
-    // Show default role on page load
-    switchRole();
 
-    // Highlight active navigation link
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentPage = window.location.pathname;
-        const navLinks = document.querySelectorAll('.nav-menu a');
-        navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentPage) {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
-        });
-    });
+    // Called when the user intentionally changes the selected role.
+    // Updated: do NOT log out or navigate. Simply switch the visible view.
+    function onRoleChange() {
+        const role = document.getElementById('roleSwitch').value;
+        switchRoleView(role);
+    }
+
+    // Initialize default visible pane without logging out
+    (function init() {
+        switchRoleView("Lecturer");
+    })();
+
+    // no-op
 </script>
