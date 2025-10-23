@@ -21,11 +21,11 @@
     --dark-text: #2c3e50;
     --medium-text: #34495e;
     --light-text: #7f8c8d;
-    --border-color: #ecf0f1;
-    --background-light: #f8f9fa;
+    --border-color: #e9ecef;
+    --background-light: #ffffff;
     --background-white: #ffffff;
     /* Gradient */
-    --gradient-primary: linear-gradient(135deg, #3498db, #2c3e50);
+    --gradient-primary: linear-gradient(135deg, #3498db, #2980b9);
     --gradient-success: linear-gradient(135deg, #27ae60, #229954);
     --gradient-danger: linear-gradient(135deg, #e74c3c, #c0392b);
     --gradient-warning: linear-gradient(135deg, #f39c12, #e67e22);
@@ -40,15 +40,25 @@
 }
 
 /* ===== BODY BACKGROUNDS ===== */
-body.dashboard-bg {
-    background: var(--background-light);
+body {
+    background: var(--background-white);
+    color: #333;
+    line-height: 1.6;
     min-height: 100vh;
 }
 
-body.auth-bg {
-    background: var(--background-white);
-    min-height: 100vh;
-}
+    body.dashboard-bg {
+        background: var(--background-white);
+        min-height: 100vh;
+    }
+
+    body.auth-bg {
+        background: var(--background-white);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
 /* ===== HEADER NAVIGATION ===== */
 .header-nav {
@@ -108,19 +118,30 @@ body.auth-bg {
 .dashboard-content {
     background: var(--background-white);
     border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     max-width: 1200px;
     margin: 40px auto;
     padding: 32px 24px;
+    border: 1px solid var(--border-color);
 }
 
 .auth-container {
     background: var(--background-white);
     border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     max-width: 420px;
     margin: 40px auto;
     padding: 40px 35px;
+    border: 1px solid var(--border-color);
+}
+
+/* Auth page center for login/register */
+.auth-page-center {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
 }
 
 /* ===== DASHBOARD WELCOME ===== */
@@ -194,8 +215,9 @@ body.auth-bg {
     background: var(--background-white);
     padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
 }
 
 /* Action Cards */
@@ -305,8 +327,9 @@ body.auth-bg {
     padding: 20px;
     border-radius: 8px;
     text-align: center;
-    background: var(--background-light);
+    background: var(--background-white);
     border-left: 4px solid;
+    border: 1px solid var(--border-color);
 }
 
     .status-card h3 {
@@ -344,7 +367,8 @@ body.auth-bg {
     background: var(--background-white);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border-color);
 }
 
     .claims-table th {
@@ -369,7 +393,7 @@ body.auth-bg {
     }
 
         .claims-table tr:hover {
-            background: var(--background-light);
+            background: #f8f9fa;
         }
 
         .claims-table tr:last-child td {
@@ -502,7 +526,7 @@ textarea.form-control {
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background-color: var(--background-light);
+    background-color: var(--background-white);
 }
 
     input.form-control:focus,
@@ -515,7 +539,7 @@ textarea.form-control {
     }
 
 .form-control:read-only {
-    background: #e9ecef;
+    background: #f8f9fa;
     color: var(--light-text);
     cursor: not-allowed;
 }
@@ -528,12 +552,12 @@ textarea.form-control {
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: var(--background-light);
+    background: var(--background-white);
 }
 
     .file-upload:hover {
         border-color: var(--primary-blue);
-        background: var(--background-white);
+        background: #f8f9fa;
     }
 
     .file-upload i {
@@ -557,14 +581,15 @@ textarea.form-control {
     justify-content: space-between;
     align-items: center;
     padding: 12px;
-    background-color: var(--background-light);
+    background-color: var(--background-white);
     border-radius: 6px;
     margin-bottom: 8px;
     transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
 }
 
     .file-item:hover {
-        background-color: var(--border-color);
+        background-color: #f8f9fa;
     }
 
     .file-item .file-info {
@@ -641,14 +666,15 @@ textarea.form-control {
     background: var(--background-white);
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
     border-left: 4px solid var(--primary-blue);
     transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
 }
 
     .claim-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
 
 .card-header {
@@ -702,6 +728,7 @@ textarea.form-control {
     padding: 16px 0;
     margin-bottom: 24px;
     box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+    border: 1px solid var(--border-color);
 }
 
     .role-switcher label {
@@ -728,6 +755,7 @@ textarea.form-control {
     margin-bottom: 18px;
     display: block;
     border-left: 5px solid;
+    border: 1px solid var(--border-color);
 }
 
     .role-view.hidden {
@@ -830,6 +858,15 @@ textarea.form-control {
     .status-cards {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .auth-page-center {
+        padding: 20px;
+    }
+
+    .auth-container {
+        padding: 40px 30px;
+        max-width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
@@ -870,6 +907,11 @@ textarea.form-control {
     .dashboard-content {
         margin: 20px auto;
         padding: 20px 15px;
+    }
+
+    .auth-container {
+        padding: 30px 20px;
+        border-radius: 15px;
     }
 }
 
@@ -914,3 +956,62 @@ textarea.form-control {
         color: #95a5a6;
         margin-bottom: 10px;
     }
+
+/* Additional form styles for auth pages */
+.form-text {
+    color: var(--light-text);
+    font-size: 0.85rem;
+    margin-top: 6px;
+    display: none;
+}
+
+.password-requirements {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    border: 1px solid var(--border-color);
+    display: none;
+}
+
+    .password-requirements small {
+        color: var(--light-text);
+        font-weight: 600;
+    }
+
+.requirement-item {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+    .requirement-item i {
+        width: 16px;
+        text-align: center;
+        margin-right: 8px;
+    }
+
+.confirm-feedback {
+    font-size: 0.9rem;
+    margin-top: 8px;
+    display: none;
+}
+
+/* Show helper texts when active */
+.show-helper {
+    display: block !important;
+}
+
+.text-success {
+    color: var(--secondary-green) !important;
+}
+
+.text-danger {
+    color: var(--status-rejected) !important;
+}
+
+.text-muted {
+    color: var(--light-text) !important;
+}

@@ -1,48 +1,202 @@
 ﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+:root {
+    --primary-blue: #3498db;
+    --primary-dark: #2980b9;
+    --secondary-color: #2c3e50;
+    --accent-color: #e74c3c;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --light-bg: #ffffff;
+    --border-color: #e9ecef;
+    --text-muted: #6c757d;
+    --background-white: #ffffff;
+}
+
 a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 1.5rem;
 }
 
 a {
-  color: #0077cc;
+    color: var(--primary-blue);
 }
+
+    a:hover {
+        color: var(--primary-dark);
+    }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+    border-color: var(--primary-blue);
+    font-weight: 600;
 }
 
+    .btn-primary:hover, .btn-primary:focus {
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue));
+        border-color: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    }
+
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+    border-color: var(--primary-blue);
 }
 
 .border-top {
-  border-top: 1px solid #e5e5e5;
+    border-top: 1px solid var(--border-color);
 }
+
 .border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
 button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+    font-size: 1rem;
+    line-height: inherit;
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+    background: var(--secondary-color);
+    color: #ffffff;
+    text-align: center;
+}
+
+/* Additional consistent styling */
+.navbar {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-color)) !important;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+}
+
+    .nav-link:hover {
+        color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+.text-primary {
+    color: var(--primary-blue) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-blue) !important;
+}
+
+.alert-success {
+    background-color: rgba(39, 174, 96, 0.1);
+    border-color: var(--success-color);
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-color: var(--accent-color);
+    color: #721c24;
+}
+
+.alert-warning {
+    background-color: rgba(243, 156, 18, 0.1);
+    border-color: var(--warning-color);
+    color: #856404;
+}
+
+/* Form controls consistency */
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Table styling consistency */
+.table-primary {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Badge styling */
+.badge.bg-primary {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, var(--success-color), #229954) !important;
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, var(--warning-color), #e67e22) !important;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+}
+
+/* Card styling */
+.card {
+    border: 1px solid var(--border-color);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    background: var(--background-white);
+}
+
+.card-header {
+    background-color: rgba(52, 152, 219, 0.05);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Body background */
+body {
+    background: var(--background-white);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.3rem;
+    }
+
+    .footer {
+        line-height: 40px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Loading states */
+.btn-primary:disabled {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    border-color: #7f8c8d;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Focus states for accessibility */
+a:focus,
+button:focus,
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
 }

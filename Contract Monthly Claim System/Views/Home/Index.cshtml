@@ -3,47 +3,428 @@
     ViewData["Title"] = "Login";
 }
 
-<link rel="stylesheet" href="~/css/auth.css" />
+<style>
+    .auth-page-center {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        padding: 20px;
+    }
+
+    .auth-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        max-width: 1000px;
+        width: 100%;
+        border: 1px solid #e9ecef;
+    }
+
+    .auth-section {
+        padding: 40px;
+        background: white;
+    }
+
+    .auth-header h2 {
+        color: #2c3e50;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .auth-header p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+
+    .form-control-lg {
+        padding: 15px 20px;
+        font-size: 1.1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+        .form-control-lg:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            background: white;
+        }
+
+    .form-text {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-top: 6px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 15px 20px;
+    }
+
+    .alert-danger {
+        background: rgba(231, 76, 60, 0.1);
+        color: #c0392b;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .auth-footer {
+        border-top: 1px solid #e9ecef;
+        padding-top: 20px;
+        margin-top: 20px;
+    }
+
+        .auth-footer a {
+            color: #3498db;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+            .auth-footer a:hover {
+                color: #2980b9;
+                text-decoration: underline;
+            }
+
+    .system-intro {
+        padding: 40px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .system-icon {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .system-intro h1 {
+        color: #2c3e50;
+        font-weight: 800;
+        font-size: 2.2rem;
+        margin-bottom: 15px;
+    }
+
+    .system-intro p {
+        color: #5a6c7d;
+        font-size: 1.2rem;
+        line-height: 1.6;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .role-info {
+        padding: 0 40px;
+    }
+
+    .role-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: #3498db;
+        }
+
+        .role-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .role-card h6 {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .role-card small {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+    .security-notice {
+        background: linear-gradient(135deg, #e8f4fd 0%, #d1ecf1 100%);
+        border: 1px solid #bee5eb;
+        border-radius: 12px;
+        margin: 0 40px 40px 40px;
+    }
+
+        .security-notice small {
+            color: #0c5460;
+            font-size: 0.95rem;
+        }
+
+        .security-notice i {
+            color: #3498db;
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .auth-container {
+            margin: 10px;
+            border-radius: 15px;
+        }
+
+        .auth-section {
+            padding: 30px 25px;
+        }
+
+        .system-intro {
+            padding: 30px 25px;
+        }
+
+            .system-intro h1 {
+                font-size: 1.8rem;
+            }
+
+            .system-intro p {
+                font-size: 1.1rem;
+            }
+
+        .role-info {
+            padding: 0 25px;
+        }
+
+        .security-notice {
+            margin: 0 25px 25px 25px;
+        }
+
+        .role-card {
+            margin-bottom: 15px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .auth-page-center {
+            padding: 10px;
+        }
+
+        .auth-section {
+            padding: 25px 20px;
+        }
+
+        .system-intro {
+            padding: 25px 20px;
+        }
+
+            .system-intro h1 {
+                font-size: 1.6rem;
+            }
+
+        .form-control-lg {
+            padding: 12px 15px;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            padding: 12px 25px;
+            font-size: 1rem;
+        }
+    }
+
+    /* Loading animation for form submission */
+    .btn-loading {
+        position: relative;
+        color: transparent;
+    }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
 
 <div class="auth-page-center">
     <div class="auth-container">
-        <div class="auth-header">
-            <h2>Welcome to the Contract Monthly Claim System</h2>
-            <p>Enter your credentials to access the dashboard.</p>
+        <!-- System Introduction Header -->
+        <div class="system-intro text-center">
+            <div class="system-icon mb-3">
+                <i class="fas fa-file-invoice-dollar fa-3x text-primary"></i>
+            </div>
+            <h1 class="mb-2 fw-bold text-dark">Contract Monthly Claim System</h1>
+            <p class="mb-4">
+                A secure platform for academic staff to submit, track, and manage monthly teaching claims.
+                Designed for Lecturers, Coordinators, and Academic Managers.
+            </p>
         </div>
-        <form asp-controller="Account" asp-action="Login" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="ReturnUrl" value="@(ViewData["ReturnUrl"] ?? "")" />
-            <div class="form-group">
-                <input type="email" name="Email" class="form-control" placeholder="Email" required />
-            </div>
-            <div class="form-group">
-                <input type="password" name="Password" class="form-control" placeholder="Password" required />
-            </div>
 
-            @* Show server-side errors as Bootstrap alerts *@
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger" role="alert">@ViewBag.Error</div>
-            }
-
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="alert alert-danger" role="alert">
-                    @foreach (var entry in ViewData.ModelState.Values)
-                    {
-                        foreach (var error in entry.Errors)
-                        {
-                            <div>@error.ErrorMessage</div>
-                        }
-                    }
+        <!-- Role-based Information -->
+        <div class="role-info mb-4">
+            <div class="row g-4 text-center">
+                <div class="col-md-4">
+                    <div class="role-card p-4">
+                        <i class="fas fa-chalkboard-teacher fa-lg text-primary mb-3"></i>
+                        <h6 class="fw-semibold mb-2">Lecturers</h6>
+                        <small class="text-muted">Submit and track teaching claims</small>
+                    </div>
                 </div>
-            }
+                <div class="col-md-4">
+                    <div class="role-card p-4">
+                        <i class="fas fa-tasks fa-lg text-success mb-3"></i>
+                        <h6 class="fw-semibold mb-2">Coordinators</h6>
+                        <small class="text-muted">Review and approve claims</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="role-card p-4">
+                        <i class="fas fa-chart-line fa-lg text-warning mb-3"></i>
+                        <h6 class="fw-semibold mb-2">Managers</h6>
+                        <small class="text-muted">Oversee and analyze data</small>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-        <div class="auth-footer">
-            <span>Don't have an account? <a href="@Url.Action("Register", "Account")">Register</a></span>
+        <!-- Login Form Section -->
+        <div class="auth-section">
+            <div class="auth-header text-center mb-4">
+                <h2 class="h3 fw-bold text-dark">Sign In to Your Account</h2>
+                <p class="text-muted">Enter your credentials to access the dashboard</p>
+            </div>
+
+            <form asp-controller="Account" asp-action="Login" method="post" id="loginForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ReturnUrl" value="@(ViewData["ReturnUrl"] ?? "")" />
+
+                <div class="form-group mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" name="Email" id="email" class="form-control form-control-lg"
+                           placeholder="Enter your institutional email" required />
+                    <div class="form-text">Use your university email address</div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" name="Password" id="password" class="form-control form-control-lg"
+                           placeholder="Enter your password" required />
+                    <div class="form-text">
+                        <a href="#" class="text-decoration-none">Forgot password?</a>
+                    </div>
+                </div>
+
+                <!-- Error Messages -->
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <div>@ViewBag.Error</div>
+                    </div>
+                }
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @foreach (var entry in ViewData.ModelState.Values)
+                        {
+                            foreach (var error in entry.Errors)
+                            {
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    <span>@error.ErrorMessage</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3" id="submitBtn">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer text-center">
+                <p class="text-muted mb-0">
+                    Don't have an account?
+                    <a href="@Url.Action("Register", "Account")" class="fw-semibold">Create account</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="security-notice text-center">
+            <small>
+                <i class="fas fa-shield-alt me-1"></i>
+                Secure academic claims management system. Your data is protected.
+            </small>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        loginForm.addEventListener('submit', function () {
+            // Add loading state to button
+            submitBtn.classList.add('btn-loading');
+            submitBtn.disabled = true;
+        });
+
+        // Remove loading state if form validation fails
+        loginForm.addEventListener('invalid', function () {
+            submitBtn.classList.remove('btn-loading');
+            submitBtn.disabled = false;
+        }, true);
+    });
+</script>

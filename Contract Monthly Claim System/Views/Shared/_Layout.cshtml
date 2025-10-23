@@ -1,5 +1,6 @@
-@{ 
+﻿@{
     var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+    var userName = User?.Identity?.Name ?? "User";
 }
 
 <!DOCTYPE html>
@@ -7,38 +8,269 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CMCS</title>
+    <title>@ViewData["Title"] - Contract Monthly Claim System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
     @RenderSection("Styles", required: false)
+    <style>
+        :root {
+            --primary-blue: #3498db;
+            --primary-dark: #2980b9;
+            --secondary-dark: #2c3e50;
+            --light-bg: #f8f9fa;
+            --border-color: #e9ecef;
+            --text-muted: #6c757d;
+        }
+
+        /* Clean, professional layout */
+        body {
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        /* Professional navbar */
+        .navbar {
+            background-color: var(--secondary-dark) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #ffffff !important;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px;
+            margin: 0 0.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: all 0.2s ease;
+        }
+
+            .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: #ffffff !important;
+            }
+
+            .nav-link i {
+                width: 16px;
+                text-align: center;
+            }
+
+        /* Logout button styling */
+        .logout-form {
+            display: inline;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: inherit;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+            .logout-btn:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+        /* User info in navbar */
+        .user-info {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .user-info i {
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+        /* Clean main content area */
+        .main-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin: 2rem auto;
+            padding: 2rem;
+            min-height: 60vh;
+        }
+
+        /* Professional footer */
+        footer {
+            background: var(--secondary-dark);
+            color: white;
+            margin-top: auto;
+            padding: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Notification area */
+        .notification-area {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 350px;
+        }
+
+        /* Responsive improvements */
+        @@media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+
+            .nav-link {
+                padding: 0.75rem 1rem !important;
+                margin: 0.1rem 0;
+            }
+
+            .main-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .user-info {
+                margin-right: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .notification-area {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .navbar-collapse {
+                padding: 1rem 0;
+            }
+
+            .main-container {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+
+            footer {
+                padding: 1rem 0;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        a:focus,
+        button:focus,
+        .nav-link:focus,
+        .logout-btn:focus {
+            outline: 2px solid var(--primary-blue);
+            outline-offset: 2px;
+        }
+    </style>
 </head>
 <body>
-    <header class="border-bottom mb-3">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Notification Area -->
+    <div class="notification-area"></div>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container">
-                <a class="navbar-brand fw-semibold" href="/">CMCS</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" href="/">
+                    <i class="fas fa-file-invoice-dollar me-2"></i>
+                    CMCS
+                </a>
+
+                @if (isAuthenticated)
+                {
+                    <div class="user-info d-none d-lg-flex">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Welcome, @userName</span>
+                    </div>
+                }
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         @if (isAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" href="/Home/Dashboard"><i class="fas fa-th-large me-1"></i>Dashboard</a>
+                                <a class="nav-link" href="/Home/Dashboard">
+                                    <i class="fas fa-th-large"></i>
+                                    <span>Dashboard</span>
+                                </a>
                             </li>
+
                             <li class="nav-item">
-                                <form asp-controller="Home" asp-action="Logout" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-link nav-link p-0"><i class="fas fa-sign-out-alt me-1"></i>Logout</button>
+                                <form class="logout-form" asp-controller="Home" asp-action="Logout" method="post">
+                                    <button type="submit" class="logout-btn">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Logout</span>
+                                    </button>
                                 </form>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item"><a class="nav-link" href="/Home/Index">Login</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/Home/Register">Register</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Home/Index">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    <span>Login</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Home/Register">
+                                    <i class="fas fa-user-plus"></i>
+                                    <span>Register</span>
+                                </a>
+                            </li>
                         }
                     </ul>
                 </div>
@@ -46,12 +278,26 @@
         </nav>
     </header>
 
-    <main class="container my-4">
-        @RenderBody()
+    <main class="container">
+        <div class="main-container">
+            @RenderBody()
+        </div>
     </main>
 
-    <footer class="text-center text-muted py-4">
-        &copy; @DateTime.Now.Year - Contract Monthly Claim System (CMCS)
+    <footer>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-md-start text-center mb-2 mb-md-0">
+                    &copy; @DateTime.Now.Year - Contract Monthly Claim System (CMCS)
+                </div>
+                <div class="col-md-6 text-md-end text-center">
+                    <small class="text-light opacity-75">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Secure Academic Claims Management
+                    </small>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -59,7 +305,66 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true" defer></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Enhanced notification system
+        function showNotification(message, type = 'info', duration = 5000) {
+            const notificationArea = document.querySelector('.notification-area');
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show`;
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            notificationArea.appendChild(notification);
+
+            if (duration > 0) {
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, duration);
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const autoHideAlerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+            autoHideAlerts.forEach(alert => {
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            });
+
+            // Add loading states to buttons
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                const buttons = form.querySelectorAll('button[type="submit"]');
+                buttons.forEach(btn => {
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = `<span class="loading-spinner me-2"></span>Processing...`;
+                    btn.disabled = true;
+
+                    // Revert on form completion
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }, 10000);
+                });
+            });
+        });
+
+        // Enhanced error handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            showNotification('An unexpected error occurred. Please try again.', 'danger');
+        });
+    </script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>
