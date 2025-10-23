@@ -521,7 +521,7 @@
         <!-- Dashboard Welcome -->
         <div class="dashboard-welcome">
             <h1><i class="fas fa-tasks"></i> Programme Coordinator Dashboard</h1>
-            <p>Welcome, Programme Coordinator! Manage and approve claims from lecturers.</p>
+            <p>Welcome, @ViewBag.FullName! Manage and approve claims from lecturers.</p>
         </div>
 
         <!-- Quick Stats -->
@@ -560,9 +560,14 @@
                     <tr>
                         <th>Claim ID</th>
                         <th>Lecturer</th>
-                        <th>Date Submitted</th>
-                        <th>Description</th>
-                        <th>Amount</th>
+                        <th>Title</th>
+                        <th>Date of Expense</th>
+                        <th>Hours Worked</th>
+                        <th>Hourly Rate (R)</th>
+                        <th>Total Amount (R)</th>
+                        <th>Category</th>
+                        <th>Additional Notes</th>
+                        <th>Documents</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -570,35 +575,8 @@
                 <tbody id="claims-table-body">
                     @foreach (var claim in Model)
                     {
-                        <tr id="claim-row-@claim.Id">
-                            <td>CLM-@claim.Id.ToString().PadLeft(3, '0')</td>
-                            <td>@claim.LecturerName</td>
-                            <td>@claim.CreatedAt.ToString("MMM dd, yyyy")</td>
-                            <td>@claim.Notes</td>
-                            <td>@String.Format("R {0:N2}", claim.Total)</td>
-                            <td>
-                                <span id="claim-status-@claim.Id" class="status-badge @(claim.Status == "Pending" ? "status-pending" :
-                                                                                                                                                                                         claim.Status == "Approved" ? "status-approved" :
-                                                                                                                                                                                         claim.Status == "Rejected" ? "status-rejected" : "")">
-                                @claim.Status
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <form asp-controller="Claims" asp-action="Approve" method="post" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@claim.Id" />
-                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                                </form>
-                                <form asp-controller="Claims" asp-action="Reject" method="post" style="display:inline; margin-left:6px">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@claim.Id" />
-                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                                        }
+                        @await Html.PartialAsync("~/Views/Claims/_ClaimRow.cshtml", claim)
+                    }
                 </tbody>
             </table>
 

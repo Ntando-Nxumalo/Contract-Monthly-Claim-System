@@ -41,6 +41,9 @@ namespace Contract_Monthly_Claim_System.Controllers
 
         public class ClaimSubmitModel
         {
+            public string? Title { get; set; }
+            public DateTime? DateOfExpense { get; set; }
+            public string? Category { get; set; }
             public double HoursWorked { get; set; }
             public double HourlyRate { get; set; }
             public string? Notes { get; set; }
@@ -58,7 +61,7 @@ namespace Contract_Monthly_Claim_System.Controllers
         [Authorize]
         public async Task<IActionResult> Submit([FromForm] ClaimSubmitModel model)
         {
-            if (model.HoursWorked <= 0 || model.HourlyRate < 0)
+            if (model.HoursWorked <= 0 || model.HourlyRate <= 0)
             {
                 ModelState.AddModelError("", "Invalid hours or rate.");
                 return RedirectToAction("LectureDashboard", "Home");
@@ -71,9 +74,12 @@ namespace Contract_Monthly_Claim_System.Controllers
             {
                 LecturerUserId = user.Id,
                 LecturerName = user.FullName ?? user.Email,
+                Title = string.IsNullOrWhiteSpace(model.Title) ? null : model.Title,
+                DateOfExpense = model.DateOfExpense,
+                Category = string.IsNullOrWhiteSpace(model.Category) ? null : model.Category,
                 HoursWorked = model.HoursWorked,
                 HourlyRate = model.HourlyRate,
-                Total = Math.Round(model.HoursWorked * model.HourlyRate, 2),
+                Total = (double)Math.Round((decimal)model.HoursWorked * (decimal)model.HourlyRate, 2, MidpointRounding.AwayFromZero),
                 Notes = model.Notes,
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow

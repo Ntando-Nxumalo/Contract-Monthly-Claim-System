@@ -181,6 +181,8 @@ namespace Contract_Monthly_Claim_System.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var u = _db.Users.Find(userId);
+            ViewBag.FullName = u?.FullName ?? (User.Identity?.Name ?? "");
             var claims = _db.Claims
                 .Where(c => c.LecturerUserId == userId)
                 .OrderByDescending(c => c.CreatedAt)
@@ -195,8 +197,13 @@ namespace Contract_Monthly_Claim_System.Controllers
         [Authorize(Roles = "Program Coordinator,Academic Manager")]
         public IActionResult CoordinatorDashboard()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var u = _db.Users.Find(userId);
+            ViewBag.FullName = u?.FullName ?? (User.Identity?.Name ?? "");
+
             var claims = _db.Claims
                 .OrderByDescending((ContractClaim c) => c.CreatedAt)
+                .Include(c => c.Documents)
                 .Take(50)
                 .AsNoTracking()
                 .ToList();
@@ -207,6 +214,9 @@ namespace Contract_Monthly_Claim_System.Controllers
         [Authorize(Roles = "Academic Manager")]
         public IActionResult ManagerDashboard()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var u = _db.Users.Find(userId);
+            ViewBag.FullName = u?.FullName ?? (User.Identity?.Name ?? "");
             var claims = _db.Claims
                 .OrderByDescending((ContractClaim c) => c.CreatedAt)
                 .Include(c => c.Documents)

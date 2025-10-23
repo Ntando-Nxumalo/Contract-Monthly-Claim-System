@@ -2,9 +2,34 @@
 <tr id="claim-row-@Model.Id">
     <td>CLM-@Model.Id.ToString().PadLeft(3, '0')</td>
     <td>@Model.LecturerName</td>
-    <td>@Model.CreatedAt.ToString("MMM dd, yyyy")</td>
-    <td>@Model.Notes</td>
+    <td>@(string.IsNullOrWhiteSpace(Model.Title) ? "-" : Model.Title)</td>
+    <td>@(Model.DateOfExpense.HasValue ? Model.DateOfExpense.Value.ToString("MMM dd, yyyy") : "-")</td>
+    <td>@Model.HoursWorked</td>
+    <td>@String.Format("R {0:N2}", Model.HourlyRate)</td>
     <td>@String.Format("R {0:N2}", Model.Total)</td>
+    <td>@(string.IsNullOrWhiteSpace(Model.Category) ? "-" : Model.Category)</td>
+    <td>@(string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes)</td>
+    <td>
+        @if (Model.Documents != null && Model.Documents.Any())
+        {
+            foreach (var d in Model.Documents)
+            {
+                <a href="@Url.Action("DownloadDocument", "Claims", new { id = d.Id })" class="btn btn-sm btn-primary" download>
+                    <i class="fas fa-download"></i> @d.FileName
+                </a>
+            }
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.DocumentPath))
+        {
+            <a href="@Url.Content(Model.DocumentPath)" class="btn btn-sm btn-primary" download>
+                <i class="fas fa-download"></i> Document
+            </a>
+        }
+        else
+        {
+            <span>-</span>
+        }
+    </td>
     <td>
         <span id="claim-status-@Model.Id" class="status-badge @(Model.Status == "Pending" ? "status-pending" : Model.Status == "Approved" ? "status-approved" : Model.Status == "Rejected" ? "status-rejected" : "")">@Model.Status</span>
     </td>

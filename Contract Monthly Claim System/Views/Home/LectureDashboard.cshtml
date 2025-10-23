@@ -531,7 +531,7 @@
     <!-- Dashboard Welcome -->
     <div class="dashboard-welcome">
         <h1><i class="fas fa-chalkboard-teacher"></i> Lecturer Dashboard</h1>
-        <p>Welcome Lecturer! Manage your claims and track their status.</p>
+        <p>Welcome, @ViewBag.FullName! Manage your claims and track their status.</p>
     </div>
 
     <!-- Quick Actions -->
@@ -569,12 +569,12 @@
 
             <div class="form-group">
                 <label for="hoursWorked">Hours Worked</label>
-                <input type="number" class="form-control" id="hoursWorked" name="HoursWorked" placeholder="Enter hours worked" min="0" step="0.5" required>
+                <input type="number" class="form-control" id="hoursWorked" name="HoursWorked" placeholder="Enter hours worked" min="0.01" step="any" required>
             </div>
 
             <div class="form-group">
                 <label for="hourlyRate">Hourly Rate (R)</label>
-                <input type="number" class="form-control" id="hourlyRate" name="HourlyRate" placeholder="Enter hourly rate" min="0" step="0.01" required>
+                <input type="number" class="form-control" id="hourlyRate" name="HourlyRate" placeholder="Enter hourly rate" min="0.01" step="0.01" required>
             </div>
 
             <div class="form-group">
@@ -662,6 +662,8 @@
             <thead>
                 <tr>
                     <th>Claim ID</th>
+                    <th>Lecturer</th>
+                    <th>Category</th>
                     <th>Date Submitted</th>
                     <th>Description</th>
                     <th>Amount</th>
@@ -675,6 +677,8 @@
                     {
                         <tr>
                             <td>CLM-@claim.Id.ToString().PadLeft(3, '0')</td>
+                            <td>@claim.LecturerName</td>
+                            <td>@(string.IsNullOrWhiteSpace(claim.Category) ? "-" : claim.Category)</td>
                             <td>@claim.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</td>
                             <td>@claim.Notes</td>
                             <td>@String.Format("R {0:N2}", claim.Total)</td>
@@ -779,8 +783,18 @@
     // handle form submission to include multiple files
     document.getElementById('claimForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        // Validate positive numbers to avoid R0 submissions
+        const hours = parseFloat((document.getElementById('hoursWorked').value || '').replace(',', '.'));
+        const rate = parseFloat((document.getElementById('hourlyRate').value || '').replace(',', '.'));
+        if (isNaN(hours) || isNaN(rate) || hours <= 0 || rate <= 0) {
+            showUploadStatus('Please enter valid Hours Worked and Hourly Rate greater than 0.', 'error');
+            return;
+        }
         const form = e.target;
         const fd = new FormData(form);
+        // Normalize numbers to culture-neutral strings before sending
+        fd.set('HoursWorked', hours.toString());
+        fd.set('HourlyRate', rate.toString());
         for (let i = 0; i < uploadedFiles.length; i++) { fd.append('Documents', uploadedFiles[i], uploadedFiles[i].name); }
         fetch(form.action, { method: 'POST', body: fd, credentials: 'include' })
         .then(async res => {
@@ -796,10 +810,15 @@
     document.getElementById('hoursWorked').addEventListener('input', calculateTotal);
     document.getElementById('hourlyRate').addEventListener('input', calculateTotal);
     function calculateTotal() {
-        const hours = parseFloat(document.getElementById('hoursWorked').value) || 0;
-        const rate = parseFloat(document.getElementById('hourlyRate').value) || 0;
-        const total = hours * rate;
-        document.getElementById('totalAmount').value = total.toFixed(2);
+        const hEl = document.getElementById('hoursWorked');
+        const rEl = document.getElementById('hourlyRate');
+        const tEl = document.getElementById('totalAmount');
+        const hours = parseFloat((hEl.value || '').replace(',', '.'));
+        const rate = parseFloat((rEl.value || '').replace(',', '.'));
+        const h = isNaN(hours) ? 0 : hours;
+        const r = isNaN(rate) ? 0 : rate;
+        const totalCents = Math.round(h * r * 100);
+        tEl.value = (totalCents / 100).toFixed(2);
     }
 
     // SignalR for minimal per-claim updates (keeps claimStatus element updated)

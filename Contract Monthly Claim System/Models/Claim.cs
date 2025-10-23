@@ -29,6 +29,17 @@ namespace Contract_Monthly_Claim_System.Models
         [Required]
         public double Total { get; set; }
 
+        // Optional descriptive title of the claim (e.g., "Teaching Hours - March")
+        [MaxLength(200)]
+        public string? Title { get; set; }
+
+        // The date the work/expense occurred (distinct from CreatedAt submission timestamp)
+        public DateTime? DateOfExpense { get; set; }
+
+        // Category of the claim (e.g., teaching, marking, preparation, consultation, other)
+        [MaxLength(50)]
+        public string? Category { get; set; }
+
         [MaxLength(500)]
         public string? Notes { get; set; }
 
