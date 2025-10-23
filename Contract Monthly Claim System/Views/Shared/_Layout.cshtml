@@ -1,4 +1,4 @@
-﻿@{
+@{
     var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
     var userName = User?.Identity?.Name ?? "User";
 }
@@ -33,15 +33,32 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        html, body, * {
+            cursor: default !important;
+        }
+
         main {
             flex: 1;
         }
 
         /* Professional navbar */
         .navbar {
-            background-color: var(--secondary-dark) !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
             padding: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 24px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.6));
+            pointer-events: none;
         }
 
         .navbar-brand {
@@ -65,6 +82,7 @@
             .nav-link:hover {
                 background-color: rgba(255, 255, 255, 0.1);
                 color: #ffffff !important;
+                transform: translateY(-1px);
             }
 
             .nav-link i {
@@ -112,8 +130,9 @@
         /* Clean main content area */
         .main-container {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
             margin: 2rem auto;
             padding: 2rem;
             min-height: 60vh;
@@ -121,11 +140,24 @@
 
         /* Professional footer */
         footer {
-            background: var(--secondary-dark);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue));
             color: white;
             margin-top: auto;
-            padding: 1.5rem 0;
-            font-size: 0.9rem;
+            padding: 1.75rem 0;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -1px;
+            height: 24px;
+            background: linear-gradient(to top, rgba(255,255,255,0), rgba(255,255,255,0.6));
+            pointer-events: none;
         }
 
         /* Loading animation */
