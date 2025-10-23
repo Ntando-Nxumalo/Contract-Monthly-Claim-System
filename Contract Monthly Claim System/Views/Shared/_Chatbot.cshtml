@@ -1,0 +1,52 @@
+@{
+    var action = (ViewContext?.RouteData?.Values["action"] as string ?? string.Empty).ToLowerInvariant();
+    var role = action.Contains("manager") ? "manager" : action.Contains("coordinator") ? "coordinator" : "lecturer";
+    var display = role == "manager" ? "Academic Manager" : role == "coordinator" ? "Programme Coordinator" : "Lecturer";
+}
+<div id="cmcs-chatbot" data-role="@role">
+    <button id="cmcs-chatbot-toggle" aria-label="Open CMCS Assistant">
+        <i class="fas fa-comments"></i>
+    </button>
+    <div class="cmcs-chat-window" aria-live="polite" aria-label="CMCS Assistant">
+        <div class="cmcs-chat-header">
+            <div class="cmcs-chat-title">CMCS Assistant — @display</div>
+            <button class="cmcs-chat-close" title="Close" aria-label="Close chat">×</button>
+        </div>
+        <div class="cmcs-chat-body" id="cmcs-chat-body"></div>
+        <div class="cmcs-chat-suggestions" id="cmcs-chat-suggestions"></div>
+        <div class="cmcs-chat-input">
+            <input type="file" id="cmcs-chat-file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt" style="display:none" />
+            <button id="cmcs-chat-attach" title="Attach files" aria-label="Attach"><i class="fas fa-paperclip"></i></button>
+            <input type="text" id="cmcs-chat-input" placeholder="Type a question..." autocomplete="off" />
+            <button id="cmcs-chat-send" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
+<style>
+    #cmcs-chatbot { position: fixed; right: 20px; bottom: 20px; z-index: 9999; font-family: inherit; }
+    #cmcs-chatbot-toggle { width: 56px; height: 56px; border-radius: 50%; border: none; background: #2c3e50; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,.2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    #cmcs-chatbot-toggle:hover { background: #1f2d3a; }
+    .cmcs-chat-window { display: none; position: fixed; right: 20px; bottom: 86px; width: 340px; max-height: 70vh; background: #fff; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,.25); overflow: hidden; border: 1px solid #e5e7eb; }
+    .cmcs-chat-window.open { display: flex; flex-direction: column; }
+    .cmcs-chat-header { background: linear-gradient(135deg,#2c3e50,#34495e); color: #fff; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; }
+    .cmcs-chat-title { font-weight: 600; font-size: 14px; }
+    .cmcs-chat-close { background: transparent; color: #fff; border: none; font-size: 20px; line-height: 1; cursor: pointer; }
+    .cmcs-chat-body { padding: 12px; overflow-y: auto; background: #f9fafb; flex: 1; }
+    .cmcs-chat-input { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #e5e7eb; background: #fff; }
+    .cmcs-chat-input input[type="text"] { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; outline: none; }
+    .cmcs-chat-input button { background: #3498db; color: #fff; border: none; border-radius: 8px; padding: 0 14px; cursor: pointer; }
+    #cmcs-chat-attach { background: #6b7280; }
+    .cmcs-chat-msg { display: flex; margin-bottom: 10px; }
+    .cmcs-chat-msg.user { justify-content: flex-end; }
+    .cmcs-chat-bubble { max-width: 80%; padding: 10px 12px; border-radius: 12px; font-size: 13px; line-height: 1.4; }
+    .cmcs-chat-msg.user .cmcs-chat-bubble { background: #2c3e50; color: #fff; border-bottom-right-radius: 4px; }
+    .cmcs-chat-msg.bot .cmcs-chat-bubble { background: #fff; color: #111827; border: 1px solid #e5e7eb; border-bottom-left-radius: 4px; }
+    .cmcs-typing { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #9ca3af; margin: 0 2px; animation: cmcs-blink 1.2s infinite; }
+    .cmcs-typing:nth-child(2) { animation-delay: .2s }
+    .cmcs-typing:nth-child(3) { animation-delay: .4s }
+    @@keyframes cmcs-blink { 0%,80%,100% { opacity: .2 } 40% { opacity: 1 } }
+    .cmcs-chat-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-top: 1px dashed #e5e7eb; background: #f9fafb; }
+    .cmcs-suggestion { font-size: 12px; background: #eef2ff; color: #1e3a8a; border: 1px solid #c7d2fe; padding: 6px 8px; border-radius: 999px; cursor: pointer; }
+    @@media (max-width: 480px) { .cmcs-chat-window { right: 10px; left: 10px; width: auto; } }
+</style>
+<script src="~/js/chatbot.js" asp-append-version="true" defer></script>

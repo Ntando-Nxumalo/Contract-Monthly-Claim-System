@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Contract_Monthly_Claim_System.Controllers
 {
@@ -70,7 +71,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Forbid();
 
-            var claim = new Claim
+            var claim = new Contract_Monthly_Claim_System.Models.Claim
             {
                 LecturerUserId = user.Id,
                 LecturerName = user.FullName ?? user.Email,
@@ -150,7 +151,10 @@ namespace Contract_Monthly_Claim_System.Controllers
             await _hub.Clients.Group("coordinators").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
             await _hub.Clients.Group($"user-{user.Id}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
 
-            TempData["Success"] = "Claim submitted successfully.";
+            if (TempData != null)
+            {
+                TempData["Success"] = "Claim submitted successfully.";
+            }
             return RedirectToAction("LectureDashboard", "Home");
         }
 
@@ -214,7 +218,8 @@ namespace Contract_Monthly_Claim_System.Controllers
             await _hub.Clients.Group("coordinators").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
             await _hub.Clients.Group($"user-{claim.LecturerUserId}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
 
-            if (Request.Headers.ContainsKey("X-Requested-With") && Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            var headers = HttpContext?.Request?.Headers;
+            if (headers != null && headers.TryGetValue("X-Requested-With", out var xrw) && xrw == "XMLHttpRequest")
             {
                 return Ok(new { id, status = claim.Status });
             }
@@ -236,7 +241,8 @@ namespace Contract_Monthly_Claim_System.Controllers
             await _hub.Clients.Group("coordinators").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
             await _hub.Clients.Group($"user-{claim.LecturerUserId}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
 
-            if (Request.Headers.ContainsKey("X-Requested-With") && Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            var headers2 = HttpContext?.Request?.Headers;
+            if (headers2 != null && headers2.TryGetValue("X-Requested-With", out var xrw2) && xrw2 == "XMLHttpRequest")
             {
                 return Ok(new { id, status = claim.Status });
             }
@@ -272,9 +278,10 @@ namespace Contract_Monthly_Claim_System.Controllers
 
             if (doc == null || doc.Claim == null) return NotFound();
 
-            var currentUserId = _userManager.GetUserId(User);
-            var canAccess = (User.IsInRole("Program Coordinator") || User.IsInRole("Academic Manager") ||
-                             (User.IsInRole("Lecturer") && doc.Claim.LecturerUserId == currentUserId));
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isCoordinator = User.IsInRole("Program Coordinator") || User.IsInRole("Academic Manager");
+            var isOwner = doc.Claim.LecturerUserId == currentUserId;
+            var canAccess = isCoordinator || isOwner;
             if (!canAccess) return Forbid();
 
             // Build physical path (stored paths are like "/Documents/{guid}.ext")
