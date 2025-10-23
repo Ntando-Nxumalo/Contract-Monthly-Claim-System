@@ -21,7 +21,7 @@ namespace Contract_Monthly_Claim_System.Data
         {
             base.OnModelCreating(builder);
 
-            // Optional: explicitly map to table name if needed
+            // explicitly map to table name if needed
             builder.Entity<Claim>().ToTable("Claims");
             builder.Entity<Lecturer>().ToTable("Lecturers");
             builder.Entity<ClaimDocument>().ToTable("ClaimDocuments");

@@ -254,27 +254,27 @@
                 <p class="text-muted">Join the Contract Monthly Claim System</p>
             </div>
 
-            <form asp-controller="Account" asp-action="Register" method="post" id="registrationForm" novalidate>
+            <form asp-controller="Home" asp-action="Register" method="post" id="registrationForm" novalidate>
                 @Html.AntiForgeryToken()
 
                 <!-- Full Name -->
                 <div class="form-group">
                     <label for="fullName" class="form-label">Full Name</label>
-                    <input type="text" name="FullName" id="fullName" class="form-control" placeholder="Enter your full name" required />
-                    <div class="form-text">Your complete name as per institutional records</div>
+                    <input type="text" name="name" id="fullName" class="form-control" placeholder="Enter your full name" required />
+                    <div class="form-text">Enter your complete name</div>
                 </div>
 
                 <!-- Email -->
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
-                    <input type="email" name="Email" id="email" class="form-control" placeholder="Enter your institutional email" required />
-                    <div class="form-text">Use your university email address</div>
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required />
+                    <div class="form-text">Use your email address</div>
                 </div>
 
                 <!-- Password -->
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" name="Password" id="password" class="form-control" placeholder="Create a secure password" required minlength="8" />
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Create a secure password" required minlength="8" />
                     <div class="password-requirements">
                         <small class="d-block mb-2">Your password must include:</small>
                         <div class="requirement-item" data-requirement="length">
@@ -312,11 +312,11 @@
                 <!-- Role -->
                 <div class="form-group">
                     <label for="role" class="form-label">Select Your Role</label>
-                    <select name="Role" id="role" class="form-select" required>
-                        <option value="">Choose your role...</option>
-                        <option value="Lecturer">Lecturer - Submit and track claims</option>
-                        <option value="Program Coordinator">Program Coordinator - Review and approve claims</option>
-                        <option value="Academic Manager">Academic Manager - Oversee department claims</option>
+                    <select name="role" id="role" class="form-select" required>
+                        <option value="">Choose your role:</option>
+                        <option value="Lecturer">Lecturer</option>
+                        <option value="Program Coordinator">Program Coordinator</option>
+                        <option value="Academic Manager">Academic Manager</option>
                     </select>
                     <div class="form-text">Select the role that matches your position</div>
                 </div>
@@ -337,7 +337,7 @@
             <div class="auth-footer text-center">
                 <p class="text-muted mb-0">
                     Already have an account?
-                    <a href="@Url.Action("Login", "Account")" class="fw-semibold">Sign in here</a>
+                    <a href="@Url.Action("Index", "Home")" class="fw-semibold">Sign in here</a>
                 </p>
             </div>
         </div>

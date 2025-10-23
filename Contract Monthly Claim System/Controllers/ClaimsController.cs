@@ -165,8 +165,8 @@ namespace Contract_Monthly_Claim_System.Controllers
             return View(claims);
         }
 
-        // GET: /Claims/ViewClaims (coordinators)
-        [Authorize]
+        // GET: /Claims/ViewClaims (coordinators/managers)
+        [Authorize(Roles = "Program Coordinator,Academic Manager")]
         public async Task<IActionResult> ViewClaims()
         {
             var claims = await _db.Claims
@@ -195,7 +195,7 @@ namespace Contract_Monthly_Claim_System.Controllers
 
         // POST: /Claims/Approve
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Program Coordinator,Academic Manager")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int id)
         {
@@ -217,7 +217,7 @@ namespace Contract_Monthly_Claim_System.Controllers
 
         // POST: /Claims/Reject
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Program Coordinator,Academic Manager")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(int id)
         {

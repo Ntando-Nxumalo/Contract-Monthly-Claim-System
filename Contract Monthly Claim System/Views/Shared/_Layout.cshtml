@@ -280,6 +280,16 @@
                                 </a>
                             </li>
 
+                            @if (User.IsInRole("Program Coordinator") || User.IsInRole("Academic Manager"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Claims/ViewClaims">
+                                        <i class="fas fa-eye"></i>
+                                        <span>Review Claims</span>
+                                    </a>
+                                </li>
+                            }
+
                             <li class="nav-item">
                                 <form class="logout-form" asp-controller="Home" asp-action="Logout" method="post">
                                     <button type="submit" class="logout-btn">

@@ -9,17 +9,20 @@
         <span id="claim-status-@Model.Id" class="status-badge @(Model.Status == "Pending" ? "status-pending" : Model.Status == "Approved" ? "status-approved" : Model.Status == "Rejected" ? "status-rejected" : "")">@Model.Status</span>
     </td>
     <td>
-        <div class="action-buttons">
-            <form asp-controller="Claims" asp-action="Approve" method="post" style="display:inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.Id" />
-                <button type="submit" class="btn btn-success btn-sm">Approve</button>
-            </form>
-            <form asp-controller="Claims" asp-action="Reject" method="post" style="display:inline; margin-left:6px">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.Id" />
-                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-            </form>
-        </div>
+        @if (User.IsInRole("Program Coordinator") || User.IsInRole("Academic Manager"))
+        {
+            <div class="action-buttons">
+                <form asp-controller="Claims" asp-action="Approve" method="post" style="display:inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                </form>
+                <form asp-controller="Claims" asp-action="Reject" method="post" style="display:inline; margin-left:6px">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                </form>
+            </div>
+        }
     </td>
 </tr>

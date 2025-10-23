@@ -6,7 +6,18 @@
     <div class="header-nav">
         <h2>Claims Review</h2>
         <div class="nav-menu">
-            <a href="/Home/CoordinatorDashboard">Dashboard</a>
+            @if (User.IsInRole("Academic Manager"))
+            {
+                <a href="@Url.Action("ManagerDashboard", "Home")">Dashboard</a>
+            }
+            else if (User.IsInRole("Program Coordinator"))
+            {
+                <a href="@Url.Action("CoordinatorDashboard", "Home")">Dashboard</a>
+            }
+            else
+            {
+                <a href="@Url.Action("Dashboard", "Home")">Dashboard</a>
+            }
         </div>
     </div>
 

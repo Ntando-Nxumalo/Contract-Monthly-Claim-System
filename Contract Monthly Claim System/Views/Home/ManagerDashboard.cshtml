@@ -417,6 +417,24 @@
         }
     </style>
     <div class="container">
+        <div class="role-switcher" style="margin-bottom: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <label for="roleSwitch" style="margin:0; font-weight:600;"><i class="fas fa-user-tag"></i> Switch View:</label>
+            <select id="roleSwitch" class="form-control" style="max-width: 260px;"
+                    data-mgr="@Url.Action("ManagerDashboard","Home")"
+                    data-coo="@Url.Action("CoordinatorDashboard","Home")"
+                    data-lec="@Url.Action("LectureDashboard","Home")"
+                    onchange="(function(sel){var v=sel.value;var mgr=sel.dataset.mgr;var coo=sel.dataset.coo;var lec=sel.dataset.lec;location.href=(v==='coordinator'?coo:(v==='lecturer'?lec:mgr));})(this)">
+                <option value="manager" selected>Manager</option>
+                <option value="coordinator">Program Coordinator</option>
+                <option value="lecturer">Lecturer</option>
+            </select>
+            <div class="btn-group" role="group" aria-label="Switch View Links">
+                <a href="@Url.Action("ManagerDashboard","Home")" class="btn btn-sm btn-outline-secondary">Manager</a>
+                <a href="@Url.Action("CoordinatorDashboard","Home")" class="btn btn-sm btn-outline-secondary">Coordinator</a>
+                <a href="@Url.Action("LectureDashboard","Home")" class="btn btn-sm btn-outline-secondary">Lecturer</a>
+            </div>
+        </div>
+        <div id="managerView" class="role-view">
         <!-- Dashboard Welcome -->
         <div class="dashboard-welcome">
             <h1><i class="fas fa-chart-line"></i> Academic Manager Dashboard</h1>
@@ -483,6 +501,7 @@
         <!-- Budget Overview removed -->
         <!-- Analytics removed -->
         <!-- Department Performance removed -->
+        </div>
     </div>
 
     <!-- Modal removed for simplified UI -->
@@ -521,6 +540,22 @@
             }
         });
         mgrConn.start().catch(e => console.error(e));
+
+        // Role switcher: navigate to dashboards to avoid embedded CSS/JS conflicts
+        document.addEventListener('DOMContentLoaded', function () {
+            const roleSwitch = document.getElementById('roleSwitch');
+            if (!roleSwitch) return;
+            roleSwitch.addEventListener('change', function () {
+                const v = this.value;
+                if (v === 'coordinator') {
+                    window.location.href = '/Home/CoordinatorDashboard';
+                } else if (v === 'lecturer') {
+                    window.location.href = '/Home/LectureDashboard';
+                } else {
+                    window.location.href = '/Home/ManagerDashboard';
+                }
+            });
+        });
 
         // AJAX-submit Approve/Reject forms to prevent navigation
         document.addEventListener('DOMContentLoaded', function () {

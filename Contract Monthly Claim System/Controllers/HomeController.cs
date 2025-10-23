@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Contract_Monthly_Claim_System.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using AuthClaim = System.Security.Claims.Claim;
@@ -26,12 +27,14 @@ namespace Contract_Monthly_Claim_System.Controllers
         }
 
         // GET: Home/Index (Login Page)
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return View();
         }
 
         // GET: Home/Register (Registration Page)
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
@@ -39,6 +42,7 @@ namespace Contract_Monthly_Claim_System.Controllers
 
         // POST: Home/Login
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(string email, string password)
         {
             // Basic validation
@@ -84,16 +88,26 @@ namespace Contract_Monthly_Claim_System.Controllers
                     ViewBag.Error = "Invalid login attempt";
                     return View("Index");
                 }
+
+                // Ensure the user has an assigned Identity role and refresh sign-in to load role claims
+                var desiredRole = string.IsNullOrWhiteSpace(user.Role) ? "Lecturer" : user.Role!;
+                if (!await _userManager.IsInRoleAsync(user, desiredRole))
+                {
+                    await _userManager.AddToRoleAsync(user, desiredRole);
+                    // Refresh the auth cookie so the role claims are present immediately
+                    await _signInManager.RefreshSignInAsync(user);
+                }
             }
 
             // Sign-in (ensures NameIdentifier claim is present and SignalR Context.UserIdentifier will work)
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            return RedirectToAction("Dashboard", "Home");
+            return await RedirectToRoleDashboardAsync(user);
         }
 
         // POST: Home/Register
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(string name, string role, string email, string password)
         {
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
@@ -131,7 +145,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectToAction("Dashboard", "Home");
+            return await RedirectToRoleDashboardAsync(user);
         }
 
         // Dashboard after successful login
@@ -143,30 +157,15 @@ namespace Contract_Monthly_Claim_System.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Provide coordinator claims to the Dashboard view so its partial can render safely.
-           var coordinatorClaims = _db.Claims
-                .OrderByDescending(c => c.CreatedAt)
-                .Take(50)
-                .AsNoTracking()
-                .ToList(); 
-
-            ViewBag.CoordinatorClaims = coordinatorClaims; 
-
-            // Provide lecturer-specific claims for the lecturer partial
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var lecturerClaims = _db.Claims
-                .Where(c => c.LecturerUserId == userId)
-                .OrderByDescending(c => c.CreatedAt)
-                .Include(c => c.Documents)
-                .AsNoTracking()
-                .Take(50)
-                .ToList();
-            ViewBag.LecturerClaims = lecturerClaims;
-
-            // Manager view uses all recent claims as well
-            ViewBag.ManagerClaims = coordinatorClaims;
-
-            return View();
+            if (User.IsInRole("Program Coordinator"))
+            {
+                return RedirectToAction("CoordinatorDashboard");
+            }
+            if (User.IsInRole("Academic Manager"))
+            {
+                return RedirectToAction("ManagerDashboard");
+            }
+            return RedirectToAction("LectureDashboard");
         } 
 
         // Logout
@@ -177,6 +176,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [Authorize(Roles = "Lecturer,Academic Manager")]
         public IActionResult LectureDashboard()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
@@ -192,6 +192,7 @@ namespace Contract_Monthly_Claim_System.Controllers
         }
 
         // Return CoordinatorDashboard with a model so direct requests don't hit a null Model.
+        [Authorize(Roles = "Program Coordinator,Academic Manager")]
         public IActionResult CoordinatorDashboard()
         {
             var claims = _db.Claims
@@ -203,6 +204,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             return View(claims);
         }
 
+        [Authorize(Roles = "Academic Manager")]
         public IActionResult ManagerDashboard()
         {
             var claims = _db.Claims
@@ -212,6 +214,20 @@ namespace Contract_Monthly_Claim_System.Controllers
                 .Take(50)
                 .ToList();
             return View(claims);
+        }
+
+        private async Task<IActionResult> RedirectToRoleDashboardAsync(ApplicationUser user)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles.Contains("Program Coordinator"))
+            {
+                return RedirectToAction("CoordinatorDashboard");
+            }
+            if (roles.Contains("Academic Manager"))
+            {
+                return RedirectToAction("ManagerDashboard");
+            }
+            return RedirectToAction("LectureDashboard");
         }
 
         [HttpGet]
