@@ -43,6 +43,7 @@ namespace Contract_Monthly_Claim_System.Controllers
         // POST: Home/Login
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
             // Basic validation
@@ -56,33 +57,14 @@ namespace Contract_Monthly_Claim_System.Controllers
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                // Create a user for dev/demo flows (password required)
-                user = new ApplicationUser
-                {
-                    UserName = email,
-                    Email = email,
-                    FullName = email,
-                    EmailConfirmed = true,
-                    Role = "Lecturer"
-                };
-
-                var createResult = await _userManager.CreateAsync(user, password);
-                if (!createResult.Succeeded)
-                {
-                    ViewBag.Error = "Unable to create user: " + string.Join("; ", createResult.Errors.Select(e => e.Description));
-                    return View("Index");
-                }
-
-                // ensure role assignment (roles are seeded at startup in Program.cs)
-                if (!string.IsNullOrEmpty(user.Role))
-                {
-                    await _userManager.AddToRoleAsync(user, user.Role);
-                }
+                ViewBag.Error = "No account found for that email.";
+                return View("Index");
             }
             else
             {
                 // Validate password and sign-in using Identity 
-                var signInResult = await _signInManager.PasswordSignInAsync(user.UserName, password, isPersistent: false, lockoutOnFailure: false);
+                var userName = string.IsNullOrWhiteSpace(user.UserName) ? user.Email : user.UserName;
+                var signInResult = await _signInManager.PasswordSignInAsync(userName, password, isPersistent: false, lockoutOnFailure: false);
                 if (!signInResult.Succeeded)
                 {
                     ViewBag.Error = "Invalid login attempt";
@@ -90,7 +72,7 @@ namespace Contract_Monthly_Claim_System.Controllers
                 }
 
                 // Ensure the user has an assigned Identity role and refresh sign-in to load role claims
-                var desiredRole = string.IsNullOrWhiteSpace(user.Role) ? "Lecturer" : user.Role!;
+                var desiredRole = string.IsNullOrWhiteSpace(user.Role) ? RoleOptions.Normalize(null) : user.Role!;
                 if (!await _userManager.IsInRoleAsync(user, desiredRole))
                 {
                     await _userManager.AddToRoleAsync(user, desiredRole);
@@ -123,13 +105,15 @@ namespace Contract_Monthly_Claim_System.Controllers
                 return View("Register");
             }
 
+            var normalizedRole = RoleOptions.Normalize(role);
+
             var user = new ApplicationUser
             {
                 UserName = email,
                 Email = email,
                 FullName = name,
                 EmailConfirmed = true,
-                Role = string.IsNullOrEmpty(role) ? "Lecturer" : role
+                Role = normalizedRole
             };
 
             var result = await _userManager.CreateAsync(user, password);
@@ -164,6 +148,10 @@ namespace Contract_Monthly_Claim_System.Controllers
             if (User.IsInRole("Academic Manager"))
             {
                 return RedirectToAction("ManagerDashboard");
+            }
+            if (User.IsInRole("HR"))
+            {
+                return RedirectToAction("Dashboard", "HR");
             }
             return RedirectToAction("LectureDashboard");
         } 
@@ -236,6 +224,10 @@ namespace Contract_Monthly_Claim_System.Controllers
             if (roles.Contains("Academic Manager"))
             {
                 return RedirectToAction("ManagerDashboard");
+            }
+            if (roles.Contains("HR"))
+            {
+                return RedirectToAction("Dashboard", "HR");
             }
             return RedirectToAction("LectureDashboard");
         }

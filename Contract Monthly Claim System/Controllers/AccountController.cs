@@ -61,7 +61,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             // Ensure we clear any existing cookie state before signing in (helps local dev edge-cases).
             await _signInManager.SignOutAsync();
 
-            // Use the user's actual UserName to sign in — avoids issues when the app stores a different username.
+            // Use the user's actual UserName to sign in ï¿½ avoids issues when the app stores a different username.
             var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, isPersistent: false, lockoutOnFailure: false);
 
             _logger.LogInformation("PasswordSignInAsync result for {Email}: {Succeeded}, IsLockedOut={IsLockedOut}, IsNotAllowed={IsNotAllowed}, RequiresTwoFactor={RequiresTwoFactor}",
@@ -135,19 +135,21 @@ namespace Contract_Monthly_Claim_System.Controllers
         {
             if (!ModelState.IsValid) return View("~/Views/Home/Register.cshtml", model);
 
+            var normalizedRole = RoleOptions.Normalize(model.Role);
+
             var user = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email,
                 FullName = model.FullName,
-                Role = model.Role
+                Role = normalizedRole
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
                 // Ensure role exists before adding (roles are seeded in Program.cs, but keep safe)
-                await _userManager.AddToRoleAsync(user, model.Role);
+                await _userManager.AddToRoleAsync(user, normalizedRole);
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 _logger.LogInformation("User created and signed in: {Email}", model.Email);
                 return RedirectToAction("Dashboard", "Home");

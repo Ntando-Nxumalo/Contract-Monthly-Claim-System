@@ -149,6 +149,7 @@ namespace Contract_Monthly_Claim_System.Controllers
 
             // Notify coordinators in real time and the claimant
             await _hub.Clients.Group("coordinators").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
+            await _hub.Clients.Group("hr").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
             await _hub.Clients.Group($"user-{user.Id}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
 
             if (TempData != null)
@@ -216,6 +217,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             await _db.SaveChangesAsync();
 
             await _hub.Clients.Group("coordinators").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
+            await _hub.Clients.Group("hr").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
             await _hub.Clients.Group($"user-{claim.LecturerUserId}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
 
             var headers = HttpContext?.Request?.Headers;
@@ -239,6 +241,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             await _db.SaveChangesAsync();
 
             await _hub.Clients.Group("coordinators").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
+            await _hub.Clients.Group("hr").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
             await _hub.Clients.Group($"user-{claim.LecturerUserId}").SendAsync("ReceiveClaimStatusUpdate", claim.Id, claim.Status);
 
             var headers2 = HttpContext?.Request?.Headers;

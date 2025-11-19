@@ -1,0 +1,86 @@
+@model List<Contract_Monthly_Claim_System.Models.ApprovedClaimSummaryDTO>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Approved Claims Report";
+    var generated = ViewData["GeneratedOn"] as DateTime? ?? DateTime.UtcNow;
+    var totalClaims = Model?.Count ?? 0;
+    var totalAmount = Model?.Sum(c => c.TotalAmount) ?? 0m;
+}
+
+<div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-1">Approved Claims Report</h1>
+            <p class="text-muted mb-0">Generated on @generated.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
+        </div>
+        <button class="btn btn-primary" onclick="window.print()">
+            <i class="fas fa-print me-2"></i> Print Report
+        </button>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="p-3 border rounded bg-light h-100">
+                <p class="text-muted mb-1">Approved Claims</p>
+                <h3 class="mb-0 text-success">@totalClaims</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 border rounded bg-light h-100">
+                <p class="text-muted mb-1">Total Payable</p>
+                <h3 class="mb-0 text-primary">@String.Format("R {0:N2}", totalAmount)</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 border rounded bg-light h-100">
+                <p class="text-muted mb-1">Pending Payments</p>
+                <h3 class="mb-0 text-warning">@totalClaims</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <strong>Approved Claims Breakdown</strong>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Claim ID</th>
+                            <th scope="col">Lecturer</th>
+                            <th scope="col">Approved Date</th>
+                            <th scope="col" class="text-end">Total Amount (R)</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            foreach (var claim in Model)
+                            {
+                                <tr>
+                                    <td>CLM-@claim.ClaimId.ToString().PadLeft(3, '0')</td>
+                                    <td>@claim.LecturerName</td>
+                                    <td>@claim.ClaimDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td class="text-end">@String.Format("{0:N2}", claim.TotalAmount)</td>
+                                    <td>
+                                        <span class="badge @(claim.Status == "Approved" ? "bg-success" : "bg-secondary")">@claim.Status</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No approved claims found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

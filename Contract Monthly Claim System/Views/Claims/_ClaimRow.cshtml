@@ -1,5 +1,8 @@
 @model Contract_Monthly_Claim_System.Models.Claim
-<tr id="claim-row-@Model.Id">
+@{
+    var totalValue = Model.Total.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+}
+<tr id="claim-row-@Model.Id" data-total="@totalValue" data-status="@Model.Status">
     <td>CLM-@Model.Id.ToString().PadLeft(3, '0')</td>
     <td>@Model.LecturerName</td>
     <td>@(string.IsNullOrWhiteSpace(Model.Title) ? "-" : Model.Title)</td>

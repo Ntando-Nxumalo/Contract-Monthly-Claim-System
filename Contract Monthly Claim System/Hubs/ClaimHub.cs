@@ -17,10 +17,19 @@ namespace Contract_Monthly_Claim_System.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            // For testing and simplicity, add all authenticated users to the coordinators group
             if (Context.User?.Identity?.IsAuthenticated == true)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, "coordinators");
+                var principal = Context.User;
+
+                if (principal?.IsInRole("Program Coordinator") == true || principal?.IsInRole("Academic Manager") == true)
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, "coordinators");
+                }
+
+                if (principal?.IsInRole("HR") == true)
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, "hr");
+                }
 
                 // Add authenticated user to a per-user group so they receive personal updates
                 var userId = Context.UserIdentifier;

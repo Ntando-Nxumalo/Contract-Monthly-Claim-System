@@ -1,0 +1,98 @@
+@model Contract_Monthly_Claim_System.Models.LecturerProfileVM
+@{
+    ViewData["Title"] = "Lecturer Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="dashboard-welcome" style="background:white;border-radius:15px;padding:24px;margin-bottom:20px;border-left:5px solid #34495e;box-shadow:0 8px 24px rgba(0,0,0,0.08)">
+        <h1 style="margin:0 0 8px 0;color:#2c3e50"><i class="fas fa-id-badge" style="color:#34495e;margin-right:10px"></i> Lecturer Profile</h1>
+        <p class="text-muted" style="margin:0">View and update lecturer contact details and claims history.</p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="row" style="gap:20px">
+        <div class="col-lg-4" style="max-width:420px">
+            <div class="card" style="background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);border:none">
+                <div class="card-header" style="background:#f8f9fa;border-bottom:1px solid #e9ecef;font-weight:700;color:#34495e">
+                    <i class="fas fa-user-circle" style="margin-right:8px"></i> Profile
+                </div>
+                <div class="card-body">
+                    <div class="mb-2"><strong>Name:</strong> @Model.Lecturer.FullName</div>
+                    <div class="mb-2"><strong>Username:</strong> @Model.Lecturer.UserName</div>
+                    <div class="mb-2"><strong>Role:</strong> @Model.Lecturer.Role</div>
+                    <hr/>
+                    <form asp-controller="HR" asp-action="UpdateLecturer" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Lecturer.Id" />
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <input class="form-control" type="email" name="newEmail" value="@Model.NewEmail" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            <input class="form-control" type="tel" name="newPhoneNumber" value="@Model.NewPhoneNumber" />
+                        </div>
+                        <button class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
+                        <a class="btn btn-secondary" href="@Url.Action("Dashboard","HR")">Back</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg" style="flex:1">
+            <div class="card" style="background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);border:none">
+                <div class="card-header" style="background:#f8f9fa;border-bottom:1px solid #e9ecef;font-weight:700;color:#34495e">
+                    <i class="fas fa-file-invoice-dollar" style="margin-right:8px"></i> Claims History
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Claim ID</th>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Hours</th>
+                                    <th>Rate</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Claims != null && Model.Claims.Count > 0)
+                                {
+                                    foreach (var c in Model.Claims)
+                                    {
+                                        <tr>
+                                            <td>CLM-@c.Id.ToString().PadLeft(3,'0')</td>
+                                            <td>@(string.IsNullOrWhiteSpace(c.Title) ? "-" : c.Title)</td>
+                                            <td>@c.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                            <td>@c.HoursWorked</td>
+                                            <td>@String.Format("R {0:N2}", c.HourlyRate)</td>
+                                            <td>@String.Format("R {0:N2}", c.Total)</td>
+                                            <td>
+                                                <span class="badge @(c.Status=="Approved"?"bg-success":c.Status=="Pending"?"bg-warning text-dark":"bg-danger")">@c.Status</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="7" class="text-muted">No claims found.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

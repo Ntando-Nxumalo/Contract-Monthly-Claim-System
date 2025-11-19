@@ -30,6 +30,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); // for Identity UI if used
 builder.Services.AddSignalR(); // For real-time notifications
+builder.Services.AddScoped<Contract_Monthly_Claim_System.Services.HRService>();
 
 // Configure cookie paths for AccessDenied and Login to existing endpoints
 builder.Services.ConfigureApplicationCookie(options =>
@@ -51,8 +52,8 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    // Added "Academic Manager" role so Manager dashboard and hub grouping match seeded roles
-    string[] roles = new[] { "Lecturer", "Program Coordinator", "Academic Manager" };
+    // Added roles including HR for Part 3
+    string[] roles = new[] { "Lecturer", "Program Coordinator", "Academic Manager", "HR" };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))

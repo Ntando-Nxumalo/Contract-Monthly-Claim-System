@@ -1,0 +1,209 @@
+@model Contract_Monthly_Claim_System.Models.HRDashboardVM
+@{
+    ViewData["Title"] = "HR Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="dashboard-welcome" style="background:white;border-radius:15px;padding:24px;margin-bottom:20px;border-left:5px solid #8e44ad;box-shadow:0 8px 24px rgba(0,0,0,0.08)">
+        <h1 style="margin:0 0 8px 0;color:#2c3e50"><i class="fas fa-user-tie" style="color:#8e44ad;margin-right:10px"></i> HR Dashboard</h1>
+        <p class="text-muted" style="margin:0">View and manage approved claims and lecturer profiles.</p>
+    </div>
+
+    <div class="overview-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:20px">
+        <div class="stat-card" style="background:white;border-radius:12px;padding:22px;border-top:4px solid #27ae60;box-shadow:0 6px 20px rgba(0,0,0,0.08);text-align:center">
+            <i class="fas fa-check-circle" style="font-size:2rem;color:#27ae60;margin-bottom:8px"></i>
+            <h3 id="total-approved-count" data-value="@Model.TotalApprovedClaims" style="margin:0;color:#27ae60;font-weight:700">@Model.TotalApprovedClaims</h3>
+            <p class="text-muted" style="margin:6px 0 0 0;font-weight:600">Approved Claims</p>
+        </div>
+        <div class="stat-card" style="background:white;border-radius:12px;padding:22px;border-top:4px solid #3498db;box-shadow:0 6px 20px rgba(0,0,0,0.08);text-align:center">
+            <i class="fas fa-money-bill-wave" style="font-size:2rem;color:#3498db;margin-bottom:8px"></i>
+            <h3 id="total-payable-amount" data-value="@Model.TotalPayableAmount.ToString(System.Globalization.CultureInfo.InvariantCulture)" style="margin:0;color:#3498db;font-weight:700">@String.Format("R {0:N2}", Model.TotalPayableAmount)</h3>
+            <p class="text-muted" style="margin:6px 0 0 0;font-weight:600">Total Payable</p>
+        </div>
+        <div class="stat-card" style="background:white;border-radius:12px;padding:22px;border-top:4px solid #f39c12;box-shadow:0 6px 20px rgba(0,0,0,0.08);text-align:center">
+            <i class="fas fa-clock" style="font-size:2rem;color:#f39c12;margin-bottom:8px"></i>
+            <h3 id="pending-payments-count" data-value="@Model.PendingPayments" style="margin:0;color:#f39c12;font-weight:700">@Model.PendingPayments</h3>
+            <p class="text-muted" style="margin:6px 0 0 0;font-weight:600">Pending Payments</p>
+        </div>
+        <div class="stat-card" style="background:white;border-radius:12px;padding:22px;border-top:4px solid #9b59b6;box-shadow:0 6px 20px rgba(0,0,0,0.08);text-align:center">
+            <i class="fas fa-file-download" style="font-size:2rem;color:#9b59b6;margin-bottom:8px"></i>
+            <div class="d-flex flex-column gap-2 align-items-center">
+                <a class="btn btn-sm btn-outline-primary w-100" href="@Url.Action("ApprovedClaimsCsv","HR")">
+                    <i class="fas fa-file-csv me-1"></i> Download CSV
+                </a>
+                <a class="btn btn-sm btn-outline-secondary w-100" href="@Url.Action("ApprovedClaimsReport","HR")" target="_blank" rel="noopener">
+                    <i class="fas fa-print me-1"></i> Print View
+                </a>
+            </div>
+            <p class="text-muted" style="margin:10px 0 0 0;font-weight:600">Approved Claims Report</p>
+        </div>
+    </div>
+
+    <div class="row" style="gap:20px">
+        <div class="col-lg" style="flex:1">
+            <div class="pending-claims" style="background:white;border-radius:15px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,0.08)">
+                <div class="section-header" style="display:flex;align-items:center;margin-bottom:10px;border-bottom:2px solid #ecf0f1;padding-bottom:10px">
+                    <h2 style="margin:0;color:#2c3e50;font-size:1.4rem"><i class="fas fa-list" style="color:#3498db;margin-right:10px"></i> Approved Claims</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="claims-table table" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Lecturer</th>
+                                <th>Title</th>
+                                <th>Date of Expense</th>
+                                <th>Hours Worked</th>
+                                <th>Hourly Rate (R)</th>
+                                <th>Total Amount (R)</th>
+                                <th>Category</th>
+                                <th>Additional Notes</th>
+                                <th>Documents</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hr-claims-body">
+                            @if (Model.ApprovedClaims != null && Model.ApprovedClaims.Any())
+                            {
+                                foreach (var claim in Model.ApprovedClaims)
+                                {
+                                    @await Html.PartialAsync("~/Views/Claims/_ClaimRow.cshtml", claim)
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="12" class="text-center text-muted py-4">No approved claims yet.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4" style="max-width:420px">
+            <div class="card" style="background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);border:none">
+                <div class="card-header" style="background:#f8f9fa;border-bottom:1px solid #e9ecef;font-weight:700;color:#8e44ad">
+                    <i class="fas fa-users" style="margin-right:8px"></i> Lecturers
+                </div>
+                <div class="card-body" style="max-height:520px;overflow:auto">
+                    @if (Model.Lecturers?.Count > 0)
+                    {
+                        foreach (var lec in Model.Lecturers)
+                        {
+                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                <div>
+                                    <div class="fw-bold">@lec.FullName</div>
+                                    <small class="text-muted">@lec.Email</small>
+                                </div>
+                                <a class="btn btn-sm btn-outline-secondary" href="@Url.Action("LecturerProfile","HR", new { id = lec.Id })">
+                                    <i class="fas fa-id-badge"></i> View
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-muted">No lecturers found.</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const totalApprovedEl = document.getElementById('total-approved-count');
+    const totalPayableEl = document.getElementById('total-payable-amount');
+    const pendingPaymentsEl = document.getElementById('pending-payments-count');
+    const currencyFormatter = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', minimumFractionDigits: 2 });
+
+    let totalApproved = parseInt(totalApprovedEl?.dataset.value ?? '0', 10) || 0;
+    let pendingPayments = parseInt(pendingPaymentsEl?.dataset.value ?? '0', 10) || 0;
+    let totalPayable = parseFloat(totalPayableEl?.dataset.value ?? '0') || 0;
+
+    function refreshSummaryCards() {
+        if (totalApprovedEl) {
+            totalApprovedEl.dataset.value = totalApproved;
+            totalApprovedEl.textContent = totalApproved;
+        }
+        if (pendingPaymentsEl) {
+            pendingPaymentsEl.dataset.value = pendingPayments;
+            pendingPaymentsEl.textContent = pendingPayments;
+        }
+        if (totalPayableEl) {
+            const formattedAmount = currencyFormatter.format(totalPayable);
+            totalPayableEl.dataset.value = totalPayable.toFixed(2);
+            totalPayableEl.textContent = formattedAmount;
+        }
+    }
+
+    function adjustSummary(deltaCount, deltaAmount) {
+        totalApproved = Math.max(0, totalApproved + deltaCount);
+        pendingPayments = Math.max(0, pendingPayments + deltaCount);
+        totalPayable = Math.max(0, parseFloat((totalPayable + deltaAmount).toFixed(2)));
+        refreshSummaryCards();
+    }
+
+    function parseRowAmount(row) {
+        if (!row) return 0;
+        const total = parseFloat(row.dataset.total ?? '0');
+        return Number.isFinite(total) ? total : 0;
+    }
+
+    refreshSummaryCards();
+
+    const hrConn = new signalR.HubConnectionBuilder().withUrl('/claimHub').build();
+    hrConn.on('ReceiveClaimStatusUpdate', function (claimId, status) {
+        const rowId = 'claim-row-' + claimId;
+        const body = document.getElementById('hr-claims-body');
+        const existing = document.getElementById(rowId);
+        const statusBadge = document.getElementById('claim-status-' + claimId);
+
+        if (status === 'Approved') {
+            if (!existing && body) {
+                fetch(`/Claims/Row/${claimId}`, { credentials: 'include' })
+                    .then(r => r.text())
+                    .then(html => {
+                        const tmp = document.createElement('tbody');
+                        tmp.innerHTML = html.trim();
+                        const newRow = tmp.querySelector('tr');
+                        if (newRow) {
+                            newRow.dataset.status = 'Approved';
+                            body.prepend(newRow);
+                            adjustSummary(1, parseRowAmount(newRow));
+                        }
+                    })
+                    .catch(err => console.error('HR row fetch failed', err));
+            } else if (existing) {
+                const wasApproved = existing.dataset.status === 'Approved';
+                existing.dataset.status = 'Approved';
+                if (!wasApproved) {
+                    adjustSummary(1, parseRowAmount(existing));
+                }
+                if (statusBadge) {
+                    statusBadge.textContent = status;
+                    statusBadge.className = 'status-badge status-approved';
+                }
+            }
+        } else if (existing) {
+            const wasApproved = existing.dataset.status === 'Approved';
+            if (wasApproved) {
+                adjustSummary(-1, -parseRowAmount(existing));
+            }
+            if (existing.parentNode) {
+                existing.parentNode.removeChild(existing);
+            }
+        }
+
+        if (statusBadge && status !== 'Approved') {
+            statusBadge.textContent = status;
+            statusBadge.className = 'status-badge ' + (status === 'Pending' ? 'status-pending' : 'status-rejected');
+        }
+    });
+    hrConn.start().catch(e => console.error(e));
+</script>
+}
