@@ -2,7 +2,7 @@
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)  
 ![License](https://img.shields.io/badge/license-MIT-blue)  
-![.NET](https://img.shields.io/badge/.NET-7.0-blueviolet)  
+![.NET](https://img.shields.io/badge/.NET-8.0-blueviolet)  
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-Configured-orange)
 
 ## Overview
