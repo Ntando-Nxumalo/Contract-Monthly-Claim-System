@@ -3,26 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Contract_Monthly_Claim_System.Models
+namespace ContractMonthlyClaimSystem.Models
 {
     public static class RoleOptions
     {
-        private static readonly string[] _supportedRoles = new[]
-        {
-            "Lecturer",
-            "Program Coordinator",
-            "Academic Manager",
-            "HR"
-        };
+        public const string Admin = "Admin";
+        public const string HR = "HR";
+        public const string Lecturer = "Lecturer";
 
-        public static IReadOnlyList<string> SupportedRoles => _supportedRoles;
+        public static IReadOnlyList<string> AllRoles { get; } = new[] { Admin, HR, Lecturer };
 
-        public static string Normalize(string? role)
-        {
-            if (string.IsNullOrWhiteSpace(role)) return _supportedRoles[0];
-            var match = _supportedRoles.FirstOrDefault(r => string.Equals(r, role, StringComparison.OrdinalIgnoreCase));
-            return match ?? _supportedRoles[0];
-        }
+        public static bool IsValid(string? role) =>
+            !string.IsNullOrEmpty(role) && AllRoles.Contains(role);
     }
 }
 
