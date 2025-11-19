@@ -95,17 +95,37 @@ namespace Contract_Monthly_Claim_System.Controllers
         public async Task<IActionResult> ApprovedClaimsCsv()
         {
             var rows = await _hrService.GetApprovedSummariesAsync();
-            var sb = new StringBuilder();
-            sb.AppendLine("ClaimId,LecturerName,ClaimDate,TotalAmount,Status");
-            foreach (var r in rows)
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("Approved Claims");
+
+            ws.Cell("A1").Value = "Claim ID";
+            ws.Cell("B1").Value = "Lecturer";
+            ws.Cell("C1").Value = "Approved Date";
+            ws.Cell("D1").Value = "Total Amount (R)";
+            ws.Cell("E1").Value = "Status";
+            ws.Range("A1:E1").Style
+                .Font.SetBold()
+                .Fill.SetBackgroundColor(XLColor.FromHtml("#f8f9fa"));
+
+            var rowIndex = 2;
+            foreach (var row in rows)
             {
-                // Use ISO date and dot decimal for CSV
-                var date = r.ClaimDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
-                var amt = r.TotalAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-                sb.AppendLine($"{r.ClaimId},\"{r.LecturerName.Replace("\"", "\"\"")}\",{date},{amt},{r.Status}");
+                ws.Cell(rowIndex, 1).Value = $"CLM-{row.ClaimId:000}";
+                ws.Cell(rowIndex, 2).Value = row.LecturerName;
+                ws.Cell(rowIndex, 3).Value = row.ClaimDate.ToLocalTime();
+                ws.Cell(rowIndex, 4).Value = row.TotalAmount;
+                ws.Cell(rowIndex, 5).Value = row.Status;
+                rowIndex++;
             }
-            var bytes = Encoding.UTF8.GetBytes(sb.ToString());
-            return File(bytes, "text/csv", $"ApprovedClaims_{DateTime.UtcNow:yyyyMMddHHmm}.csv");
+
+            ws.Column(3).Style.DateFormat.Format = "yyyy-mm-dd HH:mm";
+            ws.Column(4).Style.NumberFormat.Format = "\"R\" #,##0.00";
+            ws.Columns(1, 5).AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            var fileName = $"ApprovedClaims_{DateTime.UtcNow:yyyyMMddHHmm}.xlsx";
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         [HttpGet]
@@ -123,13 +143,30 @@ namespace Contract_Monthly_Claim_System.Controllers
             var claim = await _db.Claims.FindAsync(claimId);
             if (claim == null) return NotFound();
 
+            var isAjax = HttpContext?.Request?.Headers != null
+                && HttpContext.Request.Headers.TryGetValue("X-Requested-With", out var requestedWith)
+                && string.Equals(requestedWith, "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+
             if (!string.Equals(claim.Status, "Paid", StringComparison.OrdinalIgnoreCase))
             {
                 claim.Status = "Paid";
                 await _db.SaveChangesAsync();
-                TempData["Success"] = $"Claim CLM-{claim.Id:000} marked as paid.";
             }
 
+            var message = $"Claim CLM-{claim.Id:000} marked as paid.";
+
+            if (isAjax)
+            {
+                return Json(new
+                {
+                    success = true,
+                    claimId = claim.Id,
+                    message,
+                    total = Math.Round((decimal)claim.Total, 2, MidpointRounding.AwayFromZero)
+                });
+            }
+
+            TempData["Success"] = message;
             return RedirectToAction(nameof(Dashboard));
         }
 

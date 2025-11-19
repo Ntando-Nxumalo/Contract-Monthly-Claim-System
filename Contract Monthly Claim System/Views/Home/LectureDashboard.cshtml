@@ -658,6 +658,21 @@
             <h2><i class="fas fa-clock"></i> Recent Claims</h2>
         </div>
 
+        <div class="dashboard-toolbar">
+            <div class="flex-grow-1">
+                <label for="lecture-claim-search" class="form-label mb-1">Quick search</label>
+                <input type="search"
+                       id="lecture-claim-search"
+                       class="form-control"
+                       placeholder="Search by claim ID, category, status or notes"
+                       aria-label="Search recent claims"
+                       data-claims-search="#lecture-claims-body tr.lecture-claim-row"
+                       data-empty-state="#lecture-search-empty" />
+            </div>
+            <p class="text-muted small mb-0">Find a submission instantly without leaving the page.</p>
+        </div>
+
+        <div class="table-responsive">
         <table class="claims-table">
             <thead>
                 <tr>
@@ -670,19 +685,20 @@
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="lecture-claims-body">
                 @if (Model != null)
                 {
                     foreach (var claim in Model)
                     {
-                        <tr>
-                            <td>CLM-@claim.Id.ToString().PadLeft(3, '0')</td>
-                            <td>@claim.LecturerName</td>
-                            <td>@(string.IsNullOrWhiteSpace(claim.Category) ? "-" : claim.Category)</td>
-                            <td>@claim.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</td>
-                            <td>@claim.Notes</td>
-                            <td>@String.Format("R {0:N2}", claim.Total)</td>
-                            <td>
+                        <tr class="lecture-claim-row"
+                            data-search="@($"CLM-{claim.Id:000} {claim.Category ?? string.Empty} {claim.Status} {claim.Notes ?? string.Empty}".ToLowerInvariant())">
+                            <td data-label="Claim ID">CLM-@claim.Id.ToString().PadLeft(3, '0')</td>
+                            <td data-label="Lecturer">@claim.LecturerName</td>
+                            <td data-label="Category">@((string.IsNullOrWhiteSpace(claim.Category) ? "-" : claim.Category))</td>
+                            <td data-label="Date Submitted">@claim.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</td>
+                            <td data-label="Description">@claim.Notes</td>
+                            <td data-label="Amount">@String.Format("R {0:N2}", claim.Total)</td>
+                            <td data-label="Status">
                                 <span id="claim-status-@claim.Id" class="status-badge @(claim.Status == "Pending" ? "status-pending" : claim.Status == "Approved" ? "status-approved" : claim.Status == "Rejected" ? "status-rejected" : "")">@claim.Status</span>
                             </td>
                         </tr>
@@ -690,6 +706,13 @@
                 }
             </tbody>
         </table>
+        </div>
+
+        <div id="lecture-search-empty" class="empty-state d-none">
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <h3>No claims found</h3>
+            <p>Try a different keyword or clear the search.</p>
+        </div>
     </div>
     </div>
 

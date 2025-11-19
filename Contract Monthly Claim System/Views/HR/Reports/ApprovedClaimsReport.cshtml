@@ -84,3 +84,39 @@
     </div>
 </div>
 
+@section Styles {
+    <style>
+        @@media print {
+            body {
+                background: #fff;
+            }
+
+            nav,
+            footer,
+            .navbar,
+            .notification-area,
+            button.btn {
+                display: none !important;
+            }
+
+            .container {
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0;
+            }
+
+            .card,
+            .border,
+            .table {
+                box-shadow: none !important;
+            }
+
+            .table td,
+            .table th {
+                font-size: 12px;
+                padding: 8px;
+                white-space: nowrap;
+            }
+        }
+    </style>
+}

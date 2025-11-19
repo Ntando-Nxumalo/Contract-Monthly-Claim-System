@@ -554,7 +554,22 @@
                 <h2><i class="fas fa-clock"></i> Claims Needing Review</h2>
             </div>
 
+            <div class="dashboard-toolbar">
+                <div class="flex-grow-1">
+                    <label for="coordinator-claim-search" class="form-label mb-1">Quick search</label>
+                    <input type="search"
+                           id="coordinator-claim-search"
+                           class="form-control"
+                           placeholder="Filter by lecturer, claim ID, category or note"
+                           aria-label="Search coordinator claims"
+                           data-claims-search="#claims-table-body tr.claim-row"
+                           data-empty-state="#coordinator-search-empty" />
+                </div>
+                <p class="text-muted small mb-0">Search instantly without leaving the page.</p>
+            </div>
+
             <!-- Desktop Table View -->
+            <div class="table-responsive">
             <table class="claims-table">
                 <thead>
                     <tr>
@@ -579,40 +594,14 @@
                     }
                 </tbody>
             </table>
-
-            <!-- Mobile Card View -->
-            <div class="claim-cards">
-                @foreach (var claim in Model)
-                {
-                    <div class="claim-card" id="claim-card-@claim.Id">
-                        <div class="card-header">
-                            <h3>CLM-@claim.Id.ToString().PadLeft(3, '0')</h3>
-                            <span class="status-badge @(claim.Status == "Pending" ? "status-pending" :
-                                                                                                                         claim.Status == "Approved" ? "status-approved" :
-                                                                                                                         claim.Status == "Rejected" ? "status-rejected" : "")"
-                              id="claim-status-card-@claim.Id">@claim.Status</span>
-                    </div>
-                    <div class="card-details">
-                        <div class="card-detail"><label>Lecturer</label><span>@claim.LecturerName</span></div>
-                        <div class="card-detail"><label>Date</label><span>@claim.CreatedAt.ToString("MMM dd, yyyy")</span></div>
-                        <div class="card-detail"><label>Amount</label><span>@String.Format("R {0:N2}", claim.Total)</span></div>
-                        <div class="card-detail"><label>Description</label><span>@claim.Notes</span></div>
-                    </div>
-                    <div class="action-buttons">
-                        <form asp-controller="Claims" asp-action="Approve" method="post" style="display:inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@claim.Id" />
-                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                        </form>
-                        <form asp-controller="Claims" asp-action="Reject" method="post" style="display:inline; margin-left:6px">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@claim.Id" />
-                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                        </form>
-                    </div>
-                </div>
-                                }
             </div>
+
+            <div id="coordinator-search-empty" class="empty-state d-none">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <h3>No claims match your search</h3>
+                <p>Try another lecturer, ID or keyword.</p>
+            </div>
+
         </div>
     </div>
 

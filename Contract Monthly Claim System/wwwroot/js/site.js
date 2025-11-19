@@ -22,4 +22,50 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
+
+  // Lightweight claim search/filter inputs
+  document.querySelectorAll('[data-claims-search]').forEach(input => {
+    const selectorList = (input.dataset.claimsSearch || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+    if (selectorList.length === 0) return;
+
+    const emptyTargets = (input.dataset.emptyState || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    const filterItems = () => {
+      const query = input.value.trim().toLowerCase();
+      let matches = 0;
+
+      selectorList.forEach(sel => {
+        document.querySelectorAll(sel).forEach(item => {
+          if (item.dataset.emptyRow === 'true') {
+            return;
+          }
+          const haystack = (item.dataset.search || item.textContent || '').toLowerCase();
+          const isMatch = !query || haystack.includes(query);
+          item.classList.toggle('d-none', !isMatch);
+          if (isMatch) {
+            matches++;
+          }
+        });
+      });
+
+      const shouldShowEmpty = query.length > 0 && matches === 0;
+
+      if (emptyTargets.length) {
+        emptyTargets.forEach(sel => {
+          document.querySelectorAll(sel).forEach(el => {
+            el.classList.toggle('d-none', !shouldShowEmpty);
+          });
+        });
+      }
+    };
+
+    input.addEventListener('input', filterItems);
+    filterItems();
+  });
 });

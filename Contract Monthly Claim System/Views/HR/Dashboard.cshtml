@@ -4,50 +4,68 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container">
-    <div class="dashboard-welcome" style="background:white;border-radius:15px;padding:24px;margin-bottom:20px;border-left:5px solid #8e44ad;box-shadow:0 8px 24px rgba(0,0,0,0.08)">
-        <h1 style="margin:0 0 8px 0;color:#2c3e50"><i class="fas fa-user-tie" style="color:#8e44ad;margin-right:10px"></i> HR Dashboard</h1>
-        <p class="text-muted" style="margin:0">View and manage approved claims and lecturer profiles.</p>
-    </div>
+<div class="container py-4">
+    <div class="dashboard-content">
+        <div class="dashboard-welcome hr-welcome">
+            <h1><i class="fas fa-user-tie"></i> HR Dashboard</h1>
+            <p class="text-muted mb-0">View and manage approved claims and lecturer profiles.</p>
+        </div>
 
-    <div class="overview-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:20px">
-        <div class="stat-card" style="background:white;border-radius:12px;padding:22px;border-top:4px solid #27ae60;box-shadow:0 6px 20px rgba(0,0,0,0.08);text-align:center">
-            <i class="fas fa-check-circle" style="font-size:2rem;color:#27ae60;margin-bottom:8px"></i>
-            <h3 id="total-approved-count" data-value="@Model.TotalApprovedClaims" style="margin:0;color:#27ae60;font-weight:700">@Model.TotalApprovedClaims</h3>
-            <p class="text-muted" style="margin:6px 0 0 0;font-weight:600">Approved Claims</p>
-        </div>
-        <div class="stat-card" style="background:white;border-radius:12px;padding:22px;border-top:4px solid #3498db;box-shadow:0 6px 20px rgba(0,0,0,0.08);text-align:center">
-            <i class="fas fa-money-bill-wave" style="font-size:2rem;color:#3498db;margin-bottom:8px"></i>
-            <h3 id="total-payable-amount" data-value="@Model.TotalPayableAmount.ToString(System.Globalization.CultureInfo.InvariantCulture)" style="margin:0;color:#3498db;font-weight:700">@String.Format("R {0:N2}", Model.TotalPayableAmount)</h3>
-            <p class="text-muted" style="margin:6px 0 0 0;font-weight:600">Total Payable</p>
-        </div>
-        <div class="stat-card" style="background:white;border-radius:12px;padding:22px;border-top:4px solid #f39c12;box-shadow:0 6px 20px rgba(0,0,0,0.08);text-align:center">
-            <i class="fas fa-clock" style="font-size:2rem;color:#f39c12;margin-bottom:8px"></i>
-            <h3 id="pending-payments-count" data-value="@Model.PendingPayments" style="margin:0;color:#f39c12;font-weight:700">@Model.PendingPayments</h3>
-            <p class="text-muted" style="margin:6px 0 0 0;font-weight:600">Pending Payments</p>
-        </div>
-        <div class="stat-card" style="background:white;border-radius:12px;padding:22px;border-top:4px solid #9b59b6;box-shadow:0 6px 20px rgba(0,0,0,0.08);text-align:center">
-            <i class="fas fa-file-download" style="font-size:2rem;color:#9b59b6;margin-bottom:8px"></i>
-            <div class="d-flex flex-column gap-2 align-items-center">
-                <a class="btn btn-sm btn-outline-primary w-100" href="@Url.Action("ApprovedClaimsCsv","HR")">
-                    <i class="fas fa-file-csv me-1"></i> Download CSV
-                </a>
-                <a class="btn btn-sm btn-outline-secondary w-100" href="@Url.Action("ApprovedClaimsReport","HR")" target="_blank" rel="noopener">
-                    <i class="fas fa-print me-1"></i> Print View
-                </a>
+        <div class="overview-stats">
+            <div class="stat-card approved">
+                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                <h3 id="total-approved-count" data-value="@Model.TotalApprovedClaims">@Model.TotalApprovedClaims</h3>
+                <p>Approved Claims</p>
             </div>
-            <p class="text-muted" style="margin:10px 0 0 0;font-weight:600">Approved Claims Report</p>
-        </div>
-    </div>
-
-    <div class="row" style="gap:20px">
-        <div class="col-lg" style="flex:1">
-            <div class="pending-claims" style="background:white;border-radius:15px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,0.08)">
-                <div class="section-header" style="display:flex;align-items:center;margin-bottom:10px;border-bottom:2px solid #ecf0f1;padding-bottom:10px">
-                    <h2 style="margin:0;color:#2c3e50;font-size:1.4rem"><i class="fas fa-list" style="color:#3498db;margin-right:10px"></i> Approved Claims</h2>
+            <div class="stat-card payable">
+                <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
+                <h3 id="total-payable-amount" data-value="@Model.TotalPayableAmount.ToString(System.Globalization.CultureInfo.InvariantCulture)">@String.Format("R {0:N2}", Model.TotalPayableAmount)</h3>
+                <p>Total Payable</p>
+            </div>
+            <div class="stat-card pending">
+                <i class="fas fa-clock" aria-hidden="true"></i>
+                <h3 id="pending-payments-count" data-value="@Model.PendingPayments">@Model.PendingPayments</h3>
+                <p>Pending Payments</p>
+            </div>
+            <div class="stat-card insights">
+                <i class="fas fa-file-download" aria-hidden="true"></i>
+                <div class="d-flex flex-column gap-2 align-items-center">
+                    <a class="btn btn-sm btn-outline-primary w-100" href="@Url.Action("ApprovedClaimsCsv","HR")" aria-label="Download approved claims as Excel">
+                        <i class="fas fa-file-excel me-1"></i> Download Excel
+                    </a>
+                    <a class="btn btn-sm btn-outline-secondary w-100" href="@Url.Action("ApprovedClaimsReport","HR")" target="_blank" rel="noopener" aria-label="Open approved claims printable report">
+                        <i class="fas fa-print me-1"></i> Print View
+                    </a>
                 </div>
-                <div class="table-responsive">
-                    <table class="claims-table table" style="width:100%">
+                <p class="text-muted mb-0">Approved Claims Report</p>
+            </div>
+        </div>
+
+        <div id="hr-feedback" class="alert alert-success d-none" role="status" aria-live="polite"></div>
+
+        <div class="row g-4 align-items-start">
+            <div class="col-lg">
+                <div class="pending-claims">
+                    <div class="section-header">
+                        <h2><i class="fas fa-list" aria-hidden="true"></i> Approved Claims</h2>
+                    </div>
+
+                    <div class="dashboard-toolbar">
+                        <div class="flex-grow-1">
+                            <label for="hr-claim-search" class="form-label mb-1">Quick search</label>
+                            <input type="search"
+                                   id="hr-claim-search"
+                                   class="form-control"
+                                   placeholder="Search by lecturer, claim ID, title or notes"
+                                   aria-label="Search approved claims"
+                                   data-claims-search="#hr-claims-body tr.claim-row"
+                                   data-empty-state="#hr-search-empty" />
+                        </div>
+                        <p class="text-muted small mb-0">Use keywords to narrow down claims instantly.</p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="claims-table table">
                         <thead>
                             <tr>
                                 <th>Claim ID</th>
@@ -75,39 +93,48 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="12" class="text-center text-muted py-4">No approved claims yet.</td>
+                                    <td colspan="12" class="text-center text-muted py-4" data-empty-row="true">No approved claims yet.</td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-        <div class="col-lg-4" style="max-width:420px">
-            <div class="card" style="background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.08);border:none">
-                <div class="card-header" style="background:#f8f9fa;border-bottom:1px solid #e9ecef;font-weight:700;color:#8e44ad">
-                    <i class="fas fa-users" style="margin-right:8px"></i> Lecturers
+
+                <div id="hr-search-empty" class="empty-state d-none">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <h3>No claims match your search</h3>
+                    <p>Try another lecturer name, claim ID or keyword.</p>
                 </div>
-                <div class="card-body" style="max-height:520px;overflow:auto">
-                    @if (Model.Lecturers?.Count > 0)
-                    {
-                        foreach (var lec in Model.Lecturers)
+            </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header fw-bold text-primary">
+                        <i class="fas fa-users me-2" aria-hidden="true"></i>Lecturers
+                    </div>
+                    <div class="card-body" style="max-height:520px;overflow:auto">
+                        @if (Model.Lecturers?.Count > 0)
                         {
-                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                                <div>
-                                    <div class="fw-bold">@lec.FullName</div>
-                                    <small class="text-muted">@lec.Email</small>
+                            foreach (var lec in Model.Lecturers)
+                            {
+                                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                    <div>
+                                        <div class="fw-bold">@lec.FullName</div>
+                                        <small class="text-muted">@lec.Email</small>
+                                    </div>
+                                    <a class="btn btn-sm btn-outline-secondary"
+                                       href="@Url.Action("LecturerProfile","HR", new { id = lec.Id })"
+                                       aria-label="Open profile for @lec.FullName">
+                                        <i class="fas fa-id-badge" aria-hidden="true"></i> View
+                                    </a>
                                 </div>
-                                <a class="btn btn-sm btn-outline-secondary" href="@Url.Action("LecturerProfile","HR", new { id = lec.Id })">
-                                    <i class="fas fa-id-badge"></i> View
-                                </a>
-                            </div>
+                            }
                         }
-                    }
-                    else
-                    {
-                        <div class="text-muted">No lecturers found.</div>
-                    }
+                        else
+                        {
+                            <div class="text-muted">No lecturers found.</div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -205,5 +232,74 @@
         }
     });
     hrConn.start().catch(e => console.error(e));
+
+    const feedbackAlert = document.getElementById('hr-feedback');
+    const searchInput = document.getElementById('hr-claim-search');
+
+    function showHrFeedback(type, message) {
+        if (!feedbackAlert) return;
+        feedbackAlert.classList.remove('d-none', 'alert-success', 'alert-danger', 'alert-warning', 'alert-info');
+        const alertClass = type === 'danger' ? 'alert-danger' :
+            type === 'warning' ? 'alert-warning' :
+                type === 'info' ? 'alert-info' : 'alert-success';
+        feedbackAlert.classList.add(alertClass);
+        feedbackAlert.textContent = message;
+        clearTimeout(showHrFeedback._timeoutId);
+        showHrFeedback._timeoutId = setTimeout(() => feedbackAlert.classList.add('d-none'), 5000);
+    }
+
+    document.addEventListener('submit', function (evt) {
+        const form = evt.target;
+        if (!form.classList.contains('js-mark-paid')) {
+            return;
+        }
+        evt.preventDefault();
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+        }
+
+        const formData = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'include'
+        })
+            .then(async response => {
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text || 'Unable to mark as paid.');
+                }
+                return response.json();
+            })
+            .then(payload => {
+                if (!payload?.success) {
+                    throw new Error(payload?.message || 'Unable to mark as paid.');
+                }
+                showHrFeedback('success', payload.message ?? 'Claim marked as paid.');
+                const row = document.getElementById('claim-row-' + payload.claimId);
+                if (row) {
+                    row.classList.add('table-row-fade-out');
+                    adjustSummary(-1, -parseRowAmount(row));
+                    setTimeout(() => {
+                        row.remove();
+                        if (searchInput) {
+                            searchInput.dispatchEvent(new Event('input'));
+                        }
+                    }, 250);
+                }
+            })
+            .catch(err => {
+                console.error('MarkAsPaid error', err);
+                showHrFeedback('danger', 'Could not mark claim as paid. Please try again.');
+            })
+            .finally(() => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                }
+            });
+    }, true);
 </script>
 }

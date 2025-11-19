@@ -1,18 +1,24 @@
 @model Contract_Monthly_Claim_System.Models.Claim
 @{
     var totalValue = Model.Total.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+    var searchSignature = ($"CLM-{Model.Id:000} {Model.LecturerName} {Model.Title ?? string.Empty} {Model.Category ?? string.Empty} {Model.Status} {Model.Notes ?? string.Empty}")
+        .ToLowerInvariant();
 }
-<tr id="claim-row-@Model.Id" data-total="@totalValue" data-status="@Model.Status">
-    <td>CLM-@Model.Id.ToString().PadLeft(3, '0')</td>
-    <td>@Model.LecturerName</td>
-    <td>@(string.IsNullOrWhiteSpace(Model.Title) ? "-" : Model.Title)</td>
-    <td>@(Model.DateOfExpense.HasValue ? Model.DateOfExpense.Value.ToString("MMM dd, yyyy") : "-")</td>
-    <td>@Model.HoursWorked</td>
-    <td>@String.Format("R {0:N2}", Model.HourlyRate)</td>
-    <td>@String.Format("R {0:N2}", Model.Total)</td>
-    <td>@(string.IsNullOrWhiteSpace(Model.Category) ? "-" : Model.Category)</td>
-    <td>@(string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes)</td>
-    <td>
+<tr id="claim-row-@Model.Id"
+    class="claim-row"
+    data-total="@totalValue"
+    data-status="@Model.Status"
+    data-search="@searchSignature">
+    <td data-label="Claim ID">CLM-@Model.Id.ToString().PadLeft(3, '0')</td>
+    <td data-label="Lecturer">@Model.LecturerName</td>
+    <td data-label="Title">@(string.IsNullOrWhiteSpace(Model.Title) ? "-" : Model.Title)</td>
+    <td data-label="Date of Expense">@((Model.DateOfExpense.HasValue ? Model.DateOfExpense.Value.ToString("MMM dd, yyyy") : "-"))</td>
+    <td data-label="Hours Worked">@Model.HoursWorked</td>
+    <td data-label="Hourly Rate">@String.Format("R {0:N2}", Model.HourlyRate)</td>
+    <td data-label="Total Amount">@String.Format("R {0:N2}", Model.Total)</td>
+    <td data-label="Category">@(string.IsNullOrWhiteSpace(Model.Category) ? "-" : Model.Category)</td>
+    <td data-label="Additional Notes">@((string.IsNullOrWhiteSpace(Model.Notes) ? "-" : Model.Notes))</td>
+    <td data-label="Documents">
         @if (Model.Documents != null && Model.Documents.Any())
         {
             foreach (var d in Model.Documents)
@@ -33,10 +39,10 @@
             <span>-</span>
         }
     </td>
-    <td>
-        <span id="claim-status-@Model.Id" class="status-badge @(Model.Status == "Pending" ? "status-pending" : Model.Status == "Approved" ? "status-approved" : Model.Status == "Rejected" ? "status-rejected" : "")">@Model.Status</span>
+    <td data-label="Status">
+                <span id="claim-status-@Model.Id" class="status-badge @(Model.Status == "Pending" ? "status-pending" : Model.Status == "Approved" ? "status-approved" : Model.Status == "Rejected" ? "status-rejected" : Model.Status == "Paid" ? "status-paid" : "")">@Model.Status</span>
     </td>
-    <td>
+    <td data-label="Actions">
         @if (User.IsInRole("Program Coordinator") || User.IsInRole("Academic Manager"))
         {
             <div class="d-flex flex-wrap gap-2">
@@ -59,46 +65,64 @@
         else if (User.IsInRole("HR"))
         {
             <div class="d-flex flex-wrap gap-2 align-items-center">
-                <a class="btn btn-outline-primary btn-sm" href="@Url.Action("Details","Claims", new { id = Model.Id })" title="View documents & claim">
-                    <i class="fas fa-folder-open"></i> View
+                <a class="btn btn-outline-primary btn-sm"
+                   href="@Url.Action("Details","Claims", new { id = Model.Id })"
+                   title="Open claim details and documents"
+                   aria-label="View details for claim CLM-@Model.Id.ToString().PadLeft(3, '0')">
+                    <i class="fas fa-folder-open" aria-hidden="true"></i>
+                    <span>View Details</span>
                 </a>
-                <form asp-controller="HR" asp-action="MarkAsPaid" method="post" class="d-inline">
+                <form asp-controller="HR" asp-action="MarkAsPaid" method="post" class="d-inline js-mark-paid" data-claim-id="@Model.Id">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="claimId" value="@Model.Id" />
-                    <button type="submit" class="btn btn-outline-success btn-sm" title="Mark this claim as paid">
-                        <i class="fas fa-money-check-alt"></i> Paid
+                    <button type="submit"
+                            class="btn btn-outline-success btn-sm"
+                            title="Mark claim CLM-@Model.Id.ToString().PadLeft(3, '0') as paid"
+                            aria-label="Mark claim CLM-@Model.Id.ToString().PadLeft(3, '0') as paid"
+                            data-loading-text="<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Paying">
+                        <i class="fas fa-money-check-alt" aria-hidden="true"></i>
+                        <span>Mark Paid</span>
                     </button>
                 </form>
                 <div class="btn-group">
-                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            aria-label="Export claim options for CLM-@Model.Id.ToString().PadLeft(3, '0')">
                         <i class="fas fa-file-export"></i> Export
                     </button>
                     <ul class="dropdown-menu">
                         <li>
-                            <a class="dropdown-item" href="@Url.Action("ExportClaimPdf","HR", new { claimId = Model.Id })" target="_blank" rel="noopener">
+                            <a class="dropdown-item" href="@Url.Action("ExportClaimPdf","HR", new { claimId = Model.Id })" target="_blank" rel="noopener" aria-label="Download claim CLM-@Model.Id.ToString().PadLeft(3, '0') as PDF">
                                 <i class="fas fa-file-pdf text-danger me-2"></i>PDF
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="@Url.Action("ExportClaimExcel","HR", new { claimId = Model.Id })" target="_blank" rel="noopener">
+                            <a class="dropdown-item" href="@Url.Action("ExportClaimExcel","HR", new { claimId = Model.Id })" target="_blank" rel="noopener" aria-label="Download claim CLM-@Model.Id.ToString().PadLeft(3, '0') as Excel">
                                 <i class="fas fa-file-excel text-success me-2"></i>Excel
                             </a>
                         </li>
                     </ul>
                 </div>
-                <a class="btn btn-outline-dark btn-sm" href="@Url.Action("InvoicePreview","HR", new { claimId = Model.Id })" target="_blank" rel="noopener" title="View invoice preview">
-                    <i class="fas fa-file-invoice-dollar"></i>
+                <a class="btn btn-outline-dark btn-sm"
+                   href="@Url.Action("InvoicePreview","HR", new { claimId = Model.Id })"
+                   target="_blank"
+                   rel="noopener"
+                   title="Open invoice preview for this claim"
+                   aria-label="View invoice preview for claim CLM-@Model.Id.ToString().PadLeft(3, '0')">
+                    <i class="fas fa-file-invoice-dollar" aria-hidden="true"></i>
+                    <span class="visually-hidden">Invoice Preview</span>
                 </a>
-                <a class="btn btn-outline-dark btn-sm" href="@Url.Action("PayslipPreview","HR", new { claimId = Model.Id })" target="_blank" rel="noopener" title="View payslip preview">
-                    <i class="fas fa-receipt"></i>
+                <a class="btn btn-outline-dark btn-sm"
+                   href="@Url.Action("PayslipPreview","HR", new { claimId = Model.Id })"
+                   target="_blank"
+                   rel="noopener"
+                   title="Open payslip preview for this claim"
+                   aria-label="View payslip preview for claim CLM-@Model.Id.ToString().PadLeft(3, '0')">
+                    <i class="fas fa-receipt" aria-hidden="true"></i>
+                    <span class="visually-hidden">Payslip Preview</span>
                 </a>
-                <form asp-controller="HR" asp-action="SendPayslip" method="post" class="d-inline">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="claimId" value="@Model.Id" />
-                    <button type="submit" class="btn btn-outline-info btn-sm" title="Send payslip email">
-                        <i class="fas fa-envelope"></i> Send Payslip
-                    </button>
-                </form>
             </div>
         }
     </td>

@@ -474,7 +474,22 @@
                 <h2><i class="fas fa-clock"></i> Claims Pending Your Approval</h2>
             </div>
 
+            <div class="dashboard-toolbar">
+                <div class="flex-grow-1">
+                    <label for="manager-claim-search" class="form-label mb-1">Quick search</label>
+                    <input type="search"
+                           id="manager-claim-search"
+                           class="form-control"
+                           placeholder="Filter by lecturer, claim ID, category or amount"
+                           aria-label="Search manager claims"
+                           data-claims-search="#manager-claims-body tr.claim-row"
+                           data-empty-state="#manager-search-empty" />
+                </div>
+                <p class="text-muted small mb-0">Use keywords to jump to the claim you need.</p>
+            </div>
+
             <!-- Desktop Table View -->
+            <div class="table-responsive">
             <table class="claims-table">
                 <thead>
                     <tr>
@@ -499,6 +514,13 @@
                     }
                 </tbody>
             </table>
+            </div>
+
+            <div id="manager-search-empty" class="empty-state d-none">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <h3>No claims match your search</h3>
+                <p>Adjust or clear the filter to see all records again.</p>
+            </div>
 
             <!-- Mobile Card View removed for simplicity -->
         </div>
