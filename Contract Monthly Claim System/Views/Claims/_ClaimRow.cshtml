@@ -39,16 +39,59 @@
     <td>
         @if (User.IsInRole("Program Coordinator") || User.IsInRole("Academic Manager"))
         {
-            <div class="action-buttons">
-                <form asp-controller="Claims" asp-action="Approve" method="post" style="display:inline">
+            <div class="d-flex flex-wrap gap-2">
+                <form asp-controller="Claims" asp-action="Approve" method="post" class="d-inline">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.Id" />
-                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                    <button type="submit" class="btn btn-success btn-sm">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
                 </form>
-                <form asp-controller="Claims" asp-action="Reject" method="post" style="display:inline; margin-left:6px">
+                <form asp-controller="Claims" asp-action="Reject" method="post" class="d-inline">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.Id" />
-                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                </form>
+            </div>
+        }
+        else if (User.IsInRole("HR"))
+        {
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <a class="btn btn-outline-primary btn-sm" href="@Url.Action("Details","Claims", new { id = Model.Id })" title="View documents & claim">
+                    <i class="fas fa-folder-open"></i> View
+                </a>
+                <form asp-controller="HR" asp-action="MarkAsPaid" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="claimId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-outline-success btn-sm" title="Mark this claim as paid">
+                        <i class="fas fa-money-check-alt"></i> Paid
+                    </button>
+                </form>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-file-export"></i> Export
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("ExportClaimPdf","HR", new { claimId = Model.Id })">
+                                <i class="fas fa-file-pdf text-danger me-2"></i>PDF
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("ExportClaimExcel","HR", new { claimId = Model.Id })">
+                                <i class="fas fa-file-excel text-success me-2"></i>Excel
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <form asp-controller="HR" asp-action="SendPayslip" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="claimId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-outline-info btn-sm" title="Send payslip email">
+                        <i class="fas fa-envelope"></i> Payslip
+                    </button>
                 </form>
             </div>
         }
