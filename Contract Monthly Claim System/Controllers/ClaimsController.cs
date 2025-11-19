@@ -283,8 +283,9 @@ namespace Contract_Monthly_Claim_System.Controllers
 
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var isCoordinator = User.IsInRole("Program Coordinator") || User.IsInRole("Academic Manager");
+            var isHr = User.IsInRole("HR");
             var isOwner = doc.Claim.LecturerUserId == currentUserId;
-            var canAccess = isCoordinator || isOwner;
+            var canAccess = isCoordinator || isOwner || isHr;
             if (!canAccess) return Forbid();
 
             // Build physical path (stored paths are like "/Documents/{guid}.ext")

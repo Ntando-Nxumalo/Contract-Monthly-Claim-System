@@ -21,7 +21,7 @@ namespace Contract_Monthly_Claim_System.Services
         public async Task<HRDashboardVM> GetDashboardAsync()
         {
             var approvedQuery = _db.Claims
-                .Where(c => c.Status == "Approved");
+                .Where(c => c.Status == "Approved" && c.Total > 0);
 
             var approvedClaims = await approvedQuery
                 .Include(c => c.Documents)
@@ -77,7 +77,7 @@ namespace Contract_Monthly_Claim_System.Services
         public async Task<List<ApprovedClaimSummaryDTO>> GetApprovedSummariesAsync()
         {
             var rawClaims = await _db.Claims
-                .Where(c => c.Status == "Approved")
+                .Where(c => c.Status == "Approved" && c.Total > 0)
                 .OrderByDescending(c => c.CreatedAt)
                 .AsNoTracking()
                 .Select(c => new

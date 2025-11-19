@@ -1,0 +1,97 @@
+@model Contract_Monthly_Claim_System.Models.ClaimInvoiceVM
+@{
+    ViewData["Title"] = "Invoice Preview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var claim = Model.Claim;
+    var culture = new System.Globalization.CultureInfo("en-ZA");
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <h2 class="mb-1"><i class="fas fa-file-invoice-dollar me-2 text-primary"></i>Invoice Preview</h2>
+            <div class="text-muted">Invoice #: @Model.InvoiceNumber • Generated @Model.GeneratedOn.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+        </div>
+        <div class="btn-group">
+            <a class="btn btn-outline-primary" target="_blank" rel="noopener" href="@Url.Action("ExportClaimPdf","HR", new { claimId = claim.Id })">
+                <i class="fas fa-file-pdf me-1"></i> Download PDF
+            </a>
+            <a class="btn btn-outline-success" target="_blank" rel="noopener" href="@Url.Action("ExportClaimExcel","HR", new { claimId = claim.Id })">
+                <i class="fas fa-file-excel me-1"></i> Download Excel
+            </a>
+            <button class="btn btn-outline-secondary" type="button" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> Print
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4 class="text-primary fw-bold">@Model.CompanyName</h4>
+                    <div>@Model.CompanyAddress</div>
+                    <div>@Model.CompanyEmail</div>
+                    <div>@Model.CompanyPhone</div>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <div class="fw-bold fs-5">Invoice Details</div>
+                    <div>Claim ID: CLM-@claim.Id.ToString("000")</div>
+                    <div>Status: <span class="badge bg-secondary">@claim.Status</span></div>
+                    <div>Expense Date: @(claim.DateOfExpense?.ToString("yyyy-MM-dd") ?? "—")</div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="fw-bold text-muted text-uppercase small mb-2">Bill To</div>
+                    <div class="fs-5">@claim.LecturerName</div>
+                    <div>@(claim.LecturerUser?.Email ?? "No email")</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="fw-bold text-muted text-uppercase small mb-2">Summary</div>
+                    <div>Hours: <strong>@claim.HoursWorked.ToString("0.00")</strong></div>
+                    <div>Hourly Rate: <strong>@claim.HourlyRate.ToString("C2", culture)</strong></div>
+                    <div>Created: @claim.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                </div>
+            </div>
+
+            <div class="table-responsive mb-3">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Description</th>
+                            <th class="text-end">Hours</th>
+                            <th class="text-end">Hourly Rate</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@(string.IsNullOrWhiteSpace(claim.Title) ? "Consulting Hours" : claim.Title)</td>
+                            <td class="text-end">@claim.HoursWorked.ToString("0.00")</td>
+                            <td class="text-end">@claim.HourlyRate.ToString("C2", culture)</td>
+                            <td class="text-end">@claim.Total.ToString("C2", culture)</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-end">Total</th>
+                            <th class="text-end fs-5 text-success">@claim.Total.ToString("C2", culture)</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="mb-3">
+                <div class="fw-bold mb-1">Notes</div>
+                <div class="bg-light border rounded p-3">@(!string.IsNullOrWhiteSpace(claim.Notes) ? claim.Notes : "No additional notes supplied.")</div>
+            </div>
+
+            <div class="border-top pt-3 text-muted small">
+                Please ensure payments reference invoice <strong>@Model.InvoiceNumber</strong> for reconciliation.
+            </div>
+        </div>
+    </div>
+</div>
+

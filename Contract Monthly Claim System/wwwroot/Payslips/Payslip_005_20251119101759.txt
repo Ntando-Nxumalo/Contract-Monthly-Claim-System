@@ -1,0 +1,11 @@
+To: ntando.codes@gmail.com
+Subject: Payslip for claim CLM-005
+
+Dear Sipho,
+Amount due: R0,00
+Hours: 58
+Hourly Rate: R0,00
+Status: Approved
+
+Regards,
+HR Department

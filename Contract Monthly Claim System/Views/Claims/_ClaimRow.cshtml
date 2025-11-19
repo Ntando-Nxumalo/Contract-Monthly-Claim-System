@@ -17,14 +17,14 @@
         {
             foreach (var d in Model.Documents)
             {
-                <a href="@Url.Action("DownloadDocument", "Claims", new { id = d.Id })" class="btn btn-sm btn-primary" download>
+                <a href="@Url.Action("DownloadDocument", "Claims", new { id = d.Id })" class="btn btn-sm btn-primary" target="_blank" rel="noopener" download>
                     <i class="fas fa-download"></i> @d.FileName
                 </a>
             }
         }
         else if (!string.IsNullOrWhiteSpace(Model.DocumentPath))
         {
-            <a href="@Url.Content(Model.DocumentPath)" class="btn btn-sm btn-primary" download>
+            <a href="@Url.Content(Model.DocumentPath)" class="btn btn-sm btn-primary" target="_blank" rel="noopener" download>
                 <i class="fas fa-download"></i> Document
             </a>
         }
@@ -75,22 +75,28 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li>
-                            <a class="dropdown-item" href="@Url.Action("ExportClaimPdf","HR", new { claimId = Model.Id })">
+                            <a class="dropdown-item" href="@Url.Action("ExportClaimPdf","HR", new { claimId = Model.Id })" target="_blank" rel="noopener">
                                 <i class="fas fa-file-pdf text-danger me-2"></i>PDF
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="@Url.Action("ExportClaimExcel","HR", new { claimId = Model.Id })">
+                            <a class="dropdown-item" href="@Url.Action("ExportClaimExcel","HR", new { claimId = Model.Id })" target="_blank" rel="noopener">
                                 <i class="fas fa-file-excel text-success me-2"></i>Excel
                             </a>
                         </li>
                     </ul>
                 </div>
+                <a class="btn btn-outline-dark btn-sm" href="@Url.Action("InvoicePreview","HR", new { claimId = Model.Id })" target="_blank" rel="noopener" title="View invoice preview">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </a>
+                <a class="btn btn-outline-dark btn-sm" href="@Url.Action("PayslipPreview","HR", new { claimId = Model.Id })" target="_blank" rel="noopener" title="View payslip preview">
+                    <i class="fas fa-receipt"></i>
+                </a>
                 <form asp-controller="HR" asp-action="SendPayslip" method="post" class="d-inline">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="claimId" value="@Model.Id" />
                     <button type="submit" class="btn btn-outline-info btn-sm" title="Send payslip email">
-                        <i class="fas fa-envelope"></i> Payslip
+                        <i class="fas fa-envelope"></i> Send Payslip
                     </button>
                 </form>
             </div>

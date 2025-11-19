@@ -1,0 +1,101 @@
+@model Contract_Monthly_Claim_System.Models.PayslipPreviewVM
+@{
+    ViewData["Title"] = "Payslip Preview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var claim = Model.Claim;
+    var culture = new System.Globalization.CultureInfo("en-ZA");
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <h2 class="mb-1"><i class="fas fa-receipt me-2 text-info"></i>Payslip Preview</h2>
+            <div class="text-muted">Generated @Model.GeneratedOn.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+        </div>
+        <div class="btn-group">
+            <a class="btn btn-outline-primary" target="_blank" rel="noopener" href="@Url.Action("InvoicePreview","HR", new { claimId = claim.Id })">
+                <i class="fas fa-file-invoice-dollar me-1"></i> View Invoice
+            </a>
+            <button class="btn btn-outline-secondary" type="button" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> Print
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between flex-wrap mb-4">
+                <div>
+                    <h4 class="fw-bold text-info">@Model.CompanyName</h4>
+                    <div>@Model.CompanyAddress</div>
+                </div>
+                <div class="text-end">
+                    <div class="text-muted small text-uppercase">Employee</div>
+                    <div class="fs-5 fw-semibold">@claim.LecturerName</div>
+                    <div>@(claim.LecturerUser?.Email ?? "No email")</div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="border rounded p-3 h-100">
+                        <div class="text-muted text-uppercase small">Claim ID</div>
+                        <div class="fs-4 fw-bold">CLM-@claim.Id.ToString("000")</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3 h-100">
+                        <div class="text-muted text-uppercase small">Status</div>
+                        <div class="fs-4 fw-bold">@claim.Status</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3 h-100">
+                        <div class="text-muted text-uppercase small">Expense Date</div>
+                        <div class="fs-5">@((claim.DateOfExpense?.ToString("yyyy-MM-dd")) ?? "—")</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Earning</th>
+                            <th class="text-end">Units</th>
+                            <th class="text-end">Rate</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@(string.IsNullOrWhiteSpace(claim.Title) ? "Consulting Hours" : claim.Title)</td>
+                            <td class="text-end">@claim.HoursWorked.ToString("0.00")</td>
+                            <td class="text-end">@claim.HourlyRate.ToString("C2", culture)</td>
+                            <td class="text-end">@claim.Total.ToString("C2", culture)</td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <th colspan="3" class="text-end">Net Pay</th>
+                            <th class="text-end fs-5 text-success">@claim.Total.ToString("C2", culture)</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="mb-3">
+                <div class="fw-bold mb-1">Message to Employee</div>
+                <div class="bg-light border rounded p-3">
+                    Dear @claim.LecturerName,<br />
+                    Please find your payslip for claim CLM-@claim.Id.ToString("000"). The amount of <strong>@claim.Total.ToString("C2", culture)</strong> will be processed according to payroll schedules.
+                </div>
+            </div>
+
+            <div class="text-muted small">
+                Generated via Contract Monthly Claim System. For any discrepancies contact HR.
+            </div>
+        </div>
+    </div>
+</div>
+

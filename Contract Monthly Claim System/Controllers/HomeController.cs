@@ -172,7 +172,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             var u = _db.Users.Find(userId);
             ViewBag.FullName = u?.FullName ?? (User.Identity?.Name ?? "");
             var claims = _db.Claims
-                .Where(c => c.LecturerUserId == userId)
+                .Where(c => c.LecturerUserId == userId && c.Total > 0)
                 .OrderByDescending(c => c.CreatedAt)
                 .Include(c => c.Documents)
                 .AsNoTracking()
@@ -181,7 +181,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             return View(claims);
         }
 
-        // Return CoordinatorDashboard with a model so direct requests don't hit a null Model.
+        // Return CoordinatorDashboard with a model 
         [Authorize(Roles = "Program Coordinator,Academic Manager")]
         public IActionResult CoordinatorDashboard()
         {
@@ -190,6 +190,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             ViewBag.FullName = u?.FullName ?? (User.Identity?.Name ?? "");
 
             var claims = _db.Claims
+                .Where(c => c.Total > 0)
                 .OrderByDescending((ContractClaim c) => c.CreatedAt)
                 .Include(c => c.Documents)
                 .Take(50)
@@ -206,6 +207,7 @@ namespace Contract_Monthly_Claim_System.Controllers
             var u = _db.Users.Find(userId);
             ViewBag.FullName = u?.FullName ?? (User.Identity?.Name ?? "");
             var claims = _db.Claims
+                .Where(c => c.Total > 0)
                 .OrderByDescending((ContractClaim c) => c.CreatedAt)
                 .Include(c => c.Documents)
                 .AsNoTracking()

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
 using Contract_Monthly_Claim_System.Data;
 using Contract_Monthly_Claim_System.Models;
 using Contract_Monthly_Claim_System.Services;
@@ -14,6 +15,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace Contract_Monthly_Claim_System.Controllers
 {
@@ -24,6 +28,11 @@ namespace Contract_Monthly_Claim_System.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _db;
         private readonly IWebHostEnvironment _env;
+
+        static HRController()
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+        }
 
         public HRController(HRService hrService, UserManager<ApplicationUser> userManager, ApplicationDbContext db, IWebHostEnvironment env)
         {
@@ -127,45 +136,52 @@ namespace Contract_Monthly_Claim_System.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportClaimPdf(int claimId)
         {
-            var claim = await _db.Claims
-                .Include(c => c.LecturerUser)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == claimId);
-
+            var claim = await FindClaimWithLecturerAsync(claimId);
             if (claim == null) return NotFound();
 
-            var pdfBytes = BuildSimplePdf(claim);
-            var fileName = $"Claim_{claim.Id:000}.pdf";
+            var vm = CreateInvoiceVm(claim);
+            var pdfBytes = BuildInvoicePdf(vm);
+            var fileName = $"{vm.InvoiceNumber}.pdf";
             return File(pdfBytes, "application/pdf", fileName);
         }
 
         [HttpGet]
         public async Task<IActionResult> ExportClaimExcel(int claimId)
         {
-            var claim = await _db.Claims
-                .Include(c => c.LecturerUser)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == claimId);
-
+            var claim = await FindClaimWithLecturerAsync(claimId);
             if (claim == null) return NotFound();
 
-            var sb = new StringBuilder();
-            sb.AppendLine("ClaimId,Lecturer,Hours,HourlyRate,Total,Status,Date");
-            sb.AppendLine($"{claim.Id},\"{claim.LecturerName.Replace("\"", "\"\"")}\",{claim.HoursWorked},{claim.HourlyRate},{claim.Total},{claim.Status},{(claim.DateOfExpense?.ToString("yyyy-MM-dd") ?? "-")}");
+            var vm = CreateInvoiceVm(claim);
+            var bytes = BuildInvoiceWorkbook(vm);
+            var fileName = $"{vm.InvoiceNumber}.xlsx";
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
 
-            var bytes = Encoding.UTF8.GetBytes(sb.ToString());
-            var fileName = $"Claim_{claim.Id:000}.csv";
-            return File(bytes, "text/csv", fileName);
+        [HttpGet]
+        public async Task<IActionResult> InvoicePreview(int claimId)
+        {
+            var claim = await FindClaimWithLecturerAsync(claimId);
+            if (claim == null) return NotFound();
+
+            var vm = CreateInvoiceVm(claim);
+            return View("~/Views/HR/InvoicePreview.cshtml", vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PayslipPreview(int claimId)
+        {
+            var claim = await FindClaimWithLecturerAsync(claimId);
+            if (claim == null) return NotFound();
+
+            var vm = CreatePayslipVm(claim);
+            return View("~/Views/HR/PayslipPreview.cshtml", vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendPayslip(int claimId)
         {
-            var claim = await _db.Claims
-                .Include(c => c.LecturerUser)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == claimId);
+            var claim = await FindClaimWithLecturerAsync(claimId);
 
             if (claim == null) return NotFound();
 
@@ -201,60 +217,210 @@ namespace Contract_Monthly_Claim_System.Controllers
             return sb.ToString();
         }
 
-        private static byte[] BuildSimplePdf(Claim claim)
+        private async Task<Claim?> FindClaimWithLecturerAsync(int claimId)
+        {
+            return await _db.Claims
+                .Include(c => c.LecturerUser)
+                .Include(c => c.Documents)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == claimId);
+        }
+
+        private static ClaimInvoiceVM CreateInvoiceVm(Claim claim) => new()
+        {
+            Claim = claim,
+            GeneratedOn = DateTime.UtcNow
+        };
+
+        private static PayslipPreviewVM CreatePayslipVm(Claim claim) => new()
+        {
+            Claim = claim,
+            GeneratedOn = DateTime.UtcNow
+        };
+
+        private static byte[] BuildInvoicePdf(ClaimInvoiceVM vm)
+        {
+            var document = new ClaimInvoiceDocument(vm);
+            return document.GeneratePdf();
+        }
+
+        private static byte[] BuildInvoiceWorkbook(ClaimInvoiceVM vm)
         {
             var culture = new CultureInfo("en-ZA");
-            var lines = new[]
-            {
-                $"Claim ID: CLM-{claim.Id:000}",
-                $"Lecturer : {claim.LecturerName}",
-                $"Hours    : {claim.HoursWorked}",
-                $"Rate     : {claim.HourlyRate.ToString("C2", culture)}",
-                $"Total    : {claim.Total.ToString("C2", culture)}",
-                $"Status   : {claim.Status}",
-                $"Date     : {(claim.DateOfExpense?.ToString("yyyy-MM-dd") ?? "-")}"
-            };
-            var contentString = string.Join(" | ", lines).Replace("\\", "\\\\").Replace("(", "\\(").Replace(")", "\\)");
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("Invoice");
 
-            using var ms = new MemoryStream();
-            using var writer = new StreamWriter(ms, Encoding.ASCII, 1024, leaveOpen: true);
-            writer.NewLine = "\n";
-            writer.WriteLine("%PDF-1.4");
-            writer.Flush();
+            ws.Cell("A1").Value = vm.CompanyName;
+            ws.Range("A1:D1").Merge().Style
+                .Font.SetBold()
+                .Font.SetFontSize(18)
+                .Font.SetFontColor(XLColor.FromHtml("#4a148c"));
 
-            var offsets = new List<long>();
-            void WriteObject(string obj)
+            ws.Cell("A2").Value = vm.CompanyAddress;
+            ws.Range("A2:D2").Merge();
+
+            ws.Cell("A3").Value = $"{vm.CompanyEmail} | {vm.CompanyPhone}";
+            ws.Range("A3:D3").Merge().Style.Font.SetFontColor(XLColor.FromHtml("#5f6368"));
+
+            ws.Cell("A5").Value = "Invoice #";
+            ws.Cell("B5").Value = vm.InvoiceNumber;
+            ws.Cell("C5").Value = "Generated";
+            ws.Cell("D5").Value = vm.GeneratedOn.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+
+            ws.Cell("A6").Value = "Lecturer";
+            ws.Cell("B6").Value = vm.Claim.LecturerName;
+            ws.Cell("A7").Value = "Email";
+            ws.Cell("B7").Value = vm.Claim.LecturerUser?.Email ?? "-";
+            ws.Cell("A8").Value = "Status";
+            ws.Cell("B8").Value = vm.Claim.Status;
+
+            var tableStart = 10;
+            ws.Cell(tableStart, 1).Value = "Description";
+            ws.Cell(tableStart, 2).Value = "Hours";
+            ws.Cell(tableStart, 3).Value = "Rate";
+            ws.Cell(tableStart, 4).Value = "Amount";
+            ws.Range(tableStart, 1, tableStart, 4).Style
+                .Fill.SetBackgroundColor(XLColor.FromHtml("#ede7f6"))
+                .Font.SetBold();
+
+            var row = tableStart + 1;
+            var title = string.IsNullOrWhiteSpace(vm.Claim.Title) ? "Consulting Hours" : vm.Claim.Title;
+            ws.Cell(row, 1).Value = title;
+            ws.Cell(row, 2).Value = vm.Claim.HoursWorked;
+            ws.Cell(row, 2).Style.NumberFormat.SetFormat("0.00");
+            ws.Cell(row, 3).Value = vm.Claim.HourlyRate;
+            ws.Cell(row, 3).Style.NumberFormat.SetFormat("\"R\" #,##0.00");
+            ws.Cell(row, 4).Value = vm.Claim.Total;
+            ws.Cell(row, 4).Style.NumberFormat.SetFormat("\"R\" #,##0.00");
+
+            var notesRow = row + 2;
+            ws.Cell(notesRow, 1).Value = "Notes";
+            ws.Cell(notesRow, 1).Style.Font.SetBold();
+            ws.Range(notesRow, 2, notesRow, 4).Merge().Value = string.IsNullOrWhiteSpace(vm.Claim.Notes) ? "-" : vm.Claim.Notes;
+            ws.Range(notesRow, 1, notesRow, 4).Style.Border.SetBottomBorder(XLBorderStyleValues.Thin);
+
+            var totalRow = notesRow + 2;
+            ws.Cell(totalRow, 3).Value = "Total Due";
+            ws.Cell(totalRow, 3).Style.Font.SetBold();
+            ws.Cell(totalRow, 4).Value = vm.Claim.Total;
+            ws.Cell(totalRow, 4).Style
+                .NumberFormat.SetFormat("\"R\" #,##0.00")
+                .Font.SetBold()
+                .Font.SetFontSize(14);
+
+            ws.Columns(1, 4).AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
+        private sealed class ClaimInvoiceDocument : IDocument
+        {
+            private readonly ClaimInvoiceVM _vm;
+            private readonly CultureInfo _culture = new("en-ZA");
+
+            public ClaimInvoiceDocument(ClaimInvoiceVM vm) => _vm = vm;
+
+            public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+
+            public DocumentSettings GetSettings() => DocumentSettings.Default;
+
+            public void Compose(IDocumentContainer container)
             {
-                offsets.Add(ms.Position);
-                writer.WriteLine(obj);
-                writer.Flush();
+                container.Page(page =>
+                {
+                    page.Margin(30);
+                    page.Size(PageSizes.A4);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(11));
+
+                    page.Content().Column(stack =>
+                    {
+                        stack.Item().Row(row =>
+                        {
+                            row.RelativeItem().Column(left =>
+                            {
+                                left.Item().Text(_vm.CompanyName).FontSize(20).SemiBold().FontColor(Colors.DeepPurple.Medium);
+                                left.Item().Text(_vm.CompanyAddress);
+                                left.Item().Text($"{_vm.CompanyEmail} | {_vm.CompanyPhone}");
+                            });
+
+                            row.ConstantItem(200).Column(right =>
+                            {
+                                right.Item().Text("Invoice").FontSize(18).SemiBold();
+                                right.Item().Text($"#{_vm.InvoiceNumber}").FontColor(Colors.Grey.Darken1);
+                                right.Item().Text($"Issued: {_vm.GeneratedOn.ToLocalTime():yyyy-MM-dd HH:mm}");
+                                right.Item().Text($"Status: {_vm.Claim.Status}");
+                            });
+                        });
+
+                        stack.Item().PaddingTop(20).BorderBottom(1).BorderColor(Colors.Grey.Lighten3);
+
+                        stack.Item().PaddingTop(12).Text("Bill To").FontSize(13).SemiBold();
+                        stack.Item().Text(_vm.Claim.LecturerName);
+                        stack.Item().Text(_vm.Claim.LecturerUser?.Email ?? "-");
+
+                        stack.Item().PaddingTop(20).Element(ComposeDetailsTable);
+
+                        stack.Item().PaddingTop(20).AlignRight().Text($"Total Due: {_vm.Claim.Total.ToString("C2", _culture)}")
+                            .FontSize(16).SemiBold();
+                        if (_vm.Claim.DateOfExpense.HasValue)
+                        {
+                            stack.Item().AlignRight().Text($"Expense Date: {_vm.Claim.DateOfExpense:yyyy-MM-dd}");
+                        }
+                    });
+
+                    page.Footer()
+                        .AlignCenter()
+                        .DefaultTextStyle(x => x.FontSize(9).FontColor(Colors.Grey.Darken1))
+                        .Text(text =>
+                        {
+                            text.Span("Generated by Contract Monthly Claim System • ");
+                            text.Span(_vm.GeneratedOn.ToLocalTime().ToString("yyyy-MM-dd HH:mm"));
+                        });
+                });
             }
 
-            WriteObject("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj");
-            WriteObject("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj");
-            WriteObject("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj");
-
-            var streamContent = $"BT /F1 12 Tf 72 720 Td ({contentString}) Tj ET";
-            WriteObject($"4 0 obj\n<< /Length {streamContent.Length} >>\nstream\n{streamContent}\nendstream\nendobj");
-
-            WriteObject("5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj");
-
-            var startXref = ms.Position;
-            writer.WriteLine("xref");
-            writer.WriteLine($"0 {offsets.Count + 1}");
-            writer.WriteLine("0000000000 65535 f ");
-            foreach (var offset in offsets)
+            private void ComposeDetailsTable(IContainer container)
             {
-                writer.WriteLine($"{offset:D10} 00000 n ");
-            }
-            writer.WriteLine("trailer");
-            writer.WriteLine($"<< /Size {offsets.Count + 1} /Root 1 0 R >>");
-            writer.WriteLine("startxref");
-            writer.WriteLine(startXref);
-            writer.WriteLine("%%EOF");
-            writer.Flush();
+                var description = string.IsNullOrWhiteSpace(_vm.Claim.Title) ? "Consulting Hours" : _vm.Claim.Title;
+                container.Table(table =>
+                {
+                    table.ColumnsDefinition(columns =>
+                    {
+                        columns.RelativeColumn(4);
+                        columns.RelativeColumn(2);
+                        columns.RelativeColumn(2);
+                        columns.RelativeColumn(2);
+                    });
 
-            return ms.ToArray();
+                    table.Header(header =>
+                    {
+                        header.Cell().Element(CellStyle).Text("Description").SemiBold();
+                        header.Cell().Element(CellStyle).Text("Hours").SemiBold();
+                        header.Cell().Element(CellStyle).Text("Rate").SemiBold();
+                        header.Cell().Element(CellStyle).Text("Amount").SemiBold();
+                    });
+
+                    table.Cell().Element(CellStyle).Text(description);
+                    table.Cell().Element(CellStyle).Text(_vm.Claim.HoursWorked.ToString("0.00"));
+                    table.Cell().Element(CellStyle).Text(_vm.Claim.HourlyRate.ToString("C2", _culture));
+                    table.Cell().Element(CellStyle).Text(_vm.Claim.Total.ToString("C2", _culture));
+
+                    table.Cell().ColumnSpan(3).Element(CellStyle).Text("Notes");
+                    table.Cell().Element(CellStyle).Text(string.IsNullOrWhiteSpace(_vm.Claim.Notes) ? "-" : _vm.Claim.Notes);
+                });
+            }
+
+            private static IContainer CellStyle(IContainer container)
+            {
+                return container
+                    .BorderBottom(1)
+                    .BorderColor(Colors.Grey.Lighten3)
+                    .PaddingVertical(8)
+                    .PaddingHorizontal(6);
+            }
         }
     }
 }
